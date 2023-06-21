@@ -47,6 +47,7 @@ int main(int argc, char *argv[]) {
     int dormir = 0;
 
     // BEGIN código del alumno
+
     bool estoy_dibujando = false;
     int coordx = 0, coordy = 0;
     int iniciox, inicioy;
