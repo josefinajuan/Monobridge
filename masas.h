@@ -5,18 +5,20 @@
 
 typedef struct masas masas_t;
 
-//libero desde adentro hacia afuera
-void masas_destruir(masas_t *matriz);
-//agrego masa 
-double** masa_agregar(double** masas, size_t* f, size_t c);
+//Libero desde adentro hacia afuera
+//Pre: existe ya una masa
+void masas_destruir(masas_t *masas);
 
-//doy cantidad de filas
+//Creo primer masa
+masas_t *_masas_crear(size_t f, size_t c);
+
+//Doy cantidad de filas
 size_t masas_filas(const masas_t *masas);
 
-//doy cantidad de filas y de columnas
+//Doy cantidad de filas y de columnas
 void masas_dimensiones(const masas_t *masas, size_t *filas, size_t *columnas);
 
-//agregar una masa nueva 
+//Agrego masa 
 double** masa_agregar(double** masas, size_t* f, size_t c);
 
 //falta determinar como saber si es fijar o no 

@@ -1,17 +1,23 @@
 CFLAGS = -Wall -pedantic -std=c99 -c -g
 LFLAGS = -lm
 
-programa: pila.o complejos.o main_pila_generica.o
-	gcc pila.o complejos.o main_pila_generica.o -o programa $(LFLAGS)
+programa: lista.o malla.o masas.o resortes.o main.o
+	gcc lista.o malla.o masas.o resortes.o main.o -o programa $(LFLAGS)
 
-pila.o: pila.c pila.h
-	gcc $(CFLAGS) pila.c
+lista.o: lista.c lista.h
+	gcc $(CFLAGS) lista.c
 
-complejos.o: complejos.c complejos.h
-	gcc $(CFLAGS) complejos.c
+malla.o: malla.c malla.h
+	gcc $(CFLAGS) malla.c
 
-main_pila_generica.o: main_pila_generica.c complejos.h pila.h
-	gcc $(CFLAGS) main_pila_generica.c
+masas.o: masas.c masas.h
+	gcc $(CFLAGS) masas.c
+
+resortes.o: resortes.c resortes.h
+	gcc $(CFLAGS) resortes.c
+
+main.o: main.c lista.h malla.h masas.h resortes.h
+	gcc $(CFLAGS) main.c
 
 clean:
 	rm *.o

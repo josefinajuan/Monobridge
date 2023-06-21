@@ -10,7 +10,7 @@ typedef struct {
 } masas_t;
 
 
-void masas_destruir(masas_t *matriz){
+void masas_destruir(masas_t *masas){
     for(size_t i = 0; i < masas->filas; i++){ //libero desde adentro hacia afuera
         free(masas->m[i]); 
     }
