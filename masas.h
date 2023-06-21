@@ -9,7 +9,9 @@ typedef struct masas masas_t;
 //Pre: existe ya una masa
 void masas_destruir(masas_t *masas);
 
-//Creo primer masa
+// Creo una matriz dinamica para ordenar las masas, cada fila es una masa y en columnas la informacion de cada masa
+// Pre: Me dan la cantidad de filas y de columnas
+// Post: Matriz dinamica con tantas filas como masas y con columnas vacias
 masas_t *_masas_crear(size_t f, size_t c);
 
 //Doy cantidad de filas
