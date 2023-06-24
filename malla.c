@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+/*
 typedef struct {
     lista_t* cant_resortes;
     lista_t* resortes_totales;
@@ -17,6 +17,4 @@ typedef struct {
 cant_resortes = lista_resortes->largo;
 cant_resortes 
 
-
-
-crear_malla()
+*/

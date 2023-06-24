@@ -56,6 +56,10 @@ int main(int argc, char *argv[]) {
 
     lista_t* lista_masas = lista_crear();
     lista_t* lista_resortes = lista_crear();
+    lista_t*lista_iter_masas = lista_iter_crear(lista_masas);
+    lista_t*lista_iter_resortes = lista_iter_crear(lista_resortes);
+    int identificador = 1;
+    struct masa* masas;
     // END código del alumno
 
     unsigned int ticks = SDL_GetTicks();
@@ -69,10 +73,19 @@ int main(int argc, char *argv[]) {
                 estoy_dibujando = true;
                 iniciox = event.motion.x;
                 inicioy = event.motion.y;
-                if (lista_esta_vacia(lista_masas)){
-                    struct masa * masas = crear_masas(1, iniciox, inicioy);
+            
+                if(lista_esta_vacia(lista_masas)){ 
+                    masas = masas_crear(identificador, iniciox, inicioy);
                     lista_insertar_primero(lista_masas, masas);
+                    identificador++;
+                    lista_iter_avanzar(lista_iter_masas);
+                }  
+                if(!estoy_sobre_masa(iniciox, inicioy, lista_masas)){  
+                    masas = masas_crear(identificador, iniciox, inicioy);
+                    lista_insertar_ultimo(lista_masas, masas);
+                    lista_iter_avanzar(lista_iter_masas);
                 }
+                if(estoy_sobre_masa(iniciox, inicioy, lista_masas))
             }
             else if(event.type == SDL_MOUSEMOTION) {
                 coordx = event.motion.x;
@@ -81,10 +94,6 @@ int main(int argc, char *argv[]) {
             else if(event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
                 estoy_dibujando = false;
             }
-
-
-
-
 
             // END código del alumno
 

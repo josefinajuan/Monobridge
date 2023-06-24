@@ -6,6 +6,8 @@
 
 typedef struct masas masas_t;
 
-struct masa* crear_masas(int id, int x, int y);
+struct masa* masas_crear(int id, int x, int y);
+
+bool estoy_sobre_masa(int x, int y, lista_t* l);
 
 #endif

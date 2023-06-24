@@ -9,7 +9,8 @@ typedef struct nodo {
     struct nodo *prox;
 } nodo_t;
 
-struct lista {
+struct lista
+{
     nodo_t *prim;
     nodo_t *ult;
     size_t largo;
