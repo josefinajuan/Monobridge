@@ -2,6 +2,10 @@
 #include <stdbool.h>
 
 #include "config.h"
+#include "lista.h"
+#include "resortes.h"
+#include "masas.h"
+#include "malla.h"
 
 #ifdef TTF
 #include <SDL2/SDL_ttf.h>
@@ -18,12 +22,10 @@ void escribir_texto(SDL_Renderer *renderer, TTF_Font *font, const char *s, int x
     rect.h = surface->h;
 
     SDL_RenderCopy(renderer, texture, NULL, &rect);
-
     SDL_DestroyTexture(texture);
     SDL_FreeSurface(surface);
 }
 #endif
-
 
 int main(int argc, char *argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
@@ -51,6 +53,9 @@ int main(int argc, char *argv[]) {
     bool estoy_dibujando = false;
     int coordx = 0, coordy = 0;
     int iniciox, inicioy;
+
+    lista_t* lista_masas = lista_crear();
+    lista_t* lista_resortes = lista_crear();
     // END código del alumno
 
     unsigned int ticks = SDL_GetTicks();
@@ -64,6 +69,10 @@ int main(int argc, char *argv[]) {
                 estoy_dibujando = true;
                 iniciox = event.motion.x;
                 inicioy = event.motion.y;
+                if (lista_esta_vacia(lista_masas)){
+                    struct masa * masas = crear_masas(1, iniciox, inicioy);
+                    lista_insertar_primero(lista_masas, masas);
+                }
             }
             else if(event.type == SDL_MOUSEMOTION) {
                 coordx = event.motion.x;
@@ -72,6 +81,11 @@ int main(int argc, char *argv[]) {
             else if(event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
                 estoy_dibujando = false;
             }
+
+
+
+
+
             // END código del alumno
 
             continue;
