@@ -75,17 +75,14 @@ int main(int argc, char *argv[]) {
                 estoy_dibujando = true;
                 iniciox = event.motion.x;
                 inicioy = event.motion.y;
-            
-                if(lista_esta_vacia(lista_masas)){ 
+
+                if(!estoy_sobre_masa(iniciox, inicioy, lista_masas)){
                     crear_masa = true;
+                    masa_nueva = masas_crear(identificador, coordx, coordy);
+                    identificador = lista_largo(lista_masas);
                 }
-                else{
-                    if(!estoy_sobre_masa(iniciox, inicioy, lista_masas)){
-                        crear_masa = true;  
-                    }
-                    if(estoy_sobre_masa(iniciox, inicioy, lista_masas)){
-                        borrar_masa = true;
-                    }
+                if(estoy_sobre_masa(iniciox, inicioy, lista_masas)){
+                    borrar_masa = true;
                 }
             }
             else if(event.type == SDL_MOUSEMOTION) {
@@ -94,12 +91,11 @@ int main(int argc, char *argv[]) {
             }
             else if(event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
                 estoy_dibujando = false;
-
-                if(crear_masa){
+                if(masa_nueva!= NULL && crear_masa){
                     if (iniciox == coordx && inicioy == coordy){
-                        masa_nueva = masas_crear(identificador, coordx, coordy);
                         lista_insertar_ultimo(lista_masas, masa_nueva);
                         identificador = lista_largo(lista_masas);
+                        masa_nueva = NULL;
                     }
                     crear_masa = false;
                 }    
