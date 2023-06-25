@@ -36,4 +36,21 @@ bool estoy_sobre_masa(int x, int y, lista_t* l){
    lista_recorrer(l, coincidir_masas, coordenadas);
 }
 
+void masas_borrar(int x, int y, lista_t *lista_masas) {
+    int coordenadas[2] = {x, y};
+    lista_iter_t *lista_iter = lista_iter_crear(lista_masas);
+    int nuevo_id = 1;
 
+    while(!lista_iter_al_final(lista_iter)){
+        if(coincidir_masas(lista_iter_ver_actual(lista_iter), coordenadas)) {
+            struct masa *m = lista_iter_borrar(lista_iter);
+            free(m);
+        } else {
+            struct masa *m = lista_iter_ver_actual(lista_iter);
+            m->id = nuevo_id++;
+            lista_iter_avanzar(lista_iter);
+        }
+    }
+
+    lista_iter_destruir(lista_iter);
+}

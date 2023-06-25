@@ -55,11 +55,12 @@ int main(int argc, char *argv[]) {
     int iniciox, inicioy;
 
     lista_t* lista_masas = lista_crear();
-    lista_t* lista_resortes = lista_crear();
-    lista_t*lista_iter_masas = lista_iter_crear(lista_masas);
-    lista_t*lista_iter_resortes = lista_iter_crear(lista_resortes);
-    int identificador = 1;
-    struct masa* masas;
+    //lista_t* lista_resortes = lista_crear();
+    int identificador;
+    struct masa* masa_nueva;
+
+    bool crear_masa = false;
+    bool borrar_masa = false;
     // END código del alumno
 
     unsigned int ticks = SDL_GetTicks();
@@ -69,23 +70,23 @@ int main(int argc, char *argv[]) {
                 break;
 
             // BEGIN código del alumno
+            identificador = lista_largo(lista_masas);
             if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
                 estoy_dibujando = true;
                 iniciox = event.motion.x;
                 inicioy = event.motion.y;
             
                 if(lista_esta_vacia(lista_masas)){ 
-                    masas = masas_crear(identificador, iniciox, inicioy);
-                    lista_insertar_primero(lista_masas, masas);
-                    identificador++;
-                    lista_iter_avanzar(lista_iter_masas);
-                }  
-                if(!estoy_sobre_masa(iniciox, inicioy, lista_masas)){  
-                    masas = masas_crear(identificador, iniciox, inicioy);
-                    lista_insertar_ultimo(lista_masas, masas);
-                    lista_iter_avanzar(lista_iter_masas);
+                    crear_masa = true;
                 }
-                if(estoy_sobre_masa(iniciox, inicioy, lista_masas))
+                else{
+                    if(!estoy_sobre_masa(iniciox, inicioy, lista_masas)){
+                        crear_masa = true;  
+                    }
+                    if(estoy_sobre_masa(iniciox, inicioy, lista_masas)){
+                        borrar_masa = true;
+                    }
+                }
             }
             else if(event.type == SDL_MOUSEMOTION) {
                 coordx = event.motion.x;
@@ -93,6 +94,23 @@ int main(int argc, char *argv[]) {
             }
             else if(event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
                 estoy_dibujando = false;
+
+                if(crear_masa){
+                    if (iniciox == coordx && inicioy == coordy){
+                        masa_nueva = masas_crear(identificador, coordx, coordy);
+                        lista_insertar_ultimo(lista_masas, masa_nueva);
+                        identificador = lista_largo(lista_masas);
+                    }
+                    crear_masa = false;
+                }    
+                else if(borrar_masa){
+                    if(iniciox == coordx && inicioy == coordy){
+                        masas_borrar(coordx, coordy, lista_masas);
+                        identificador = lista_largo(lista_masas);
+                    }
+                    borrar_masa = false;
+                    
+                }
             }
 
             // END código del alumno
