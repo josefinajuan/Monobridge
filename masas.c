@@ -6,51 +6,85 @@
 #include <stdlib.h>
 
 struct masa{
-    int id;
-    int coordx;
-    int coordy;
+    size_t id;
+    float coordx, coordy, tam;
+    bool es_fija;
 };
 
-struct masa* masas_crear(int id, int x, int y){
-    struct masa* m = malloc (sizeof(struct masa));
-    if (m == NULL){
-        return NULL;
-    } 
+struct masa* masa_crear(size_t id, float x, float y, float tam){
+    struct masa* m = malloc(sizeof(struct masa));
+    if (m == NULL) return NULL;
+
     m->id = id;
     m->coordx= x;
     m->coordy = y;
+    m->tam = tam;
+    m-> es_fija = false;
 
     return m;
 }
 
-bool coincidir_masas(void* dato, void* extra){ 
-    struct masa *m = (struct masa*) dato; 
-    int x = *((int *)extra);
-    int y = *((int *)(extra + sizeof(int)));
-
-    return (m->coordx == x && m->coordy == y);
+float masa_obtener_coordy(const masa_t *masa) {
+    return masa->coordy;
 }
 
-bool estoy_sobre_masa(int x, int y, lista_t* l){
-   int coordenadas[2]= {x,y};
-   lista_recorrer(l, coincidir_masas, coordenadas);
+float masa_obtener_coordx(const masa_t *masa) {
+    return masa->coordx;
 }
 
-void masas_borrar(int x, int y, lista_t *lista_masas) {
-    int coordenadas[2] = {x, y};
-    lista_iter_t *lista_iter = lista_iter_crear(lista_masas);
-    int nuevo_id = 1;
+size_t masa_obtener_id(const masa_t *masa) {
+    return masa->id;
+}
 
-    while(!lista_iter_al_final(lista_iter)){
-        if(coincidir_masas(lista_iter_ver_actual(lista_iter), coordenadas)) {
-            struct masa *m = lista_iter_borrar(lista_iter);
-            free(m);
-        } else {
-            struct masa *m = lista_iter_ver_actual(lista_iter);
-            m->id = nuevo_id++;
-            lista_iter_avanzar(lista_iter);
-        }
+float masa_obtener_tam(const masa_t *masa) {
+    return masa->tam;
+}
+
+void masa_actualizar_ids_masa(lista_iter_t *iter, lista_t *lista_masas) {
+    size_t id_actual = 0;
+    while (!lista_iter_al_final(iter)) {
+        masa_t *masa = lista_iter_ver_actual(iter);
+        masa->id = id_actual++;
+        lista_iter_avanzar(iter);
+    }
+}
+
+void masa_borrar(masa_t* masa) {
+    free(masa);
+}
+
+bool coincidir_masas(const masa_t *masa, int coordenadas[2]) {
+    return (masa->coordx == coordenadas[0] && masa->coordy == coordenadas[1]);
+}
+
+bool eliminar_masa_de_lista(masa_t* masa, lista_t* lista_masas) {
+    lista_iter_t* iter = lista_iter_crear(lista_masas);
+    if (iter == NULL) {
+        return false;
     }
 
-    lista_iter_destruir(lista_iter);
+    while (!lista_iter_al_final(iter)) {
+        masa_t* masa_actual = lista_iter_ver_actual(iter);
+        if (masa_actual == masa) {
+            lista_iter_borrar(iter);
+            lista_iter_destruir(iter);
+            return true;
+        }
+        lista_iter_avanzar(iter);
+    }
+
+    lista_iter_destruir(iter);
+    return false;
+}
+
+void masa_actualizar_coordx(masa_t* masa, float coordx) {
+    masa->coordx = coordx;
+}
+
+void masa_actualizar_coordy(masa_t* masa, float coordy) {
+    masa->coordy = coordy;
+}
+
+bool es_fija(const masa_t * masa) {
+    return masa -> es_fija;
 }

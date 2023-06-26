@@ -1,12 +1,15 @@
 #ifndef RESORTES_H
 #define RESORTES_H
 
+#include "lista.h"
+#include "masas.h"
 
-typedef struct resortes resortes_t;
+typedef struct resorte resorte_t;
 
-/*Se crea un resorte
-resortes_t resorte_crear();
-void resorte_destruir();
+size_t resorte_obtener_id(const resorte_t *resorte);
+float resorte_obtener_k(const resorte_t *resorte);
+float resorte_obtener_lo(const resorte_t *resorte);
+masa_t *resorte_obtener_m1(const resorte_t *resorte);
+masa_t *resorte_obtener_m2(const resorte_t *resorte);
 
-*/
 #endif

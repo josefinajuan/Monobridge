@@ -6,6 +6,11 @@
 #include "resortes.h"
 #include "masas.h"
 #include "malla.h"
+#include "dibujo.h"
+
+#define MARGEN_ERROR 10
+
+
 
 #ifdef TTF
 #include <SDL2/SDL_ttf.h>
@@ -50,17 +55,22 @@ int main(int argc, char *argv[]) {
 
     // BEGIN código del alumno
 
-    bool estoy_dibujando = false;
+    //bool estoy_dibujando = false;
     int coordx = 0, coordy = 0;
     int iniciox, inicioy;
+    int x, y;
 
-    lista_t* lista_masas = lista_crear();
+    //lista_t* lista_masas = lista_crear();
     //lista_t* lista_resortes = lista_crear();
-    int identificador;
+    malla_t* malla = malla_crear();
+    size_t id__;
+    size_t id_masa;
     struct masa* masa_nueva;
 
+    bool estoy_dibujando = false;
     bool crear_masa = false;
-    bool borrar_masa = false;
+    bool moviendo_masa = false;
+
     // END código del alumno
 
     unsigned int ticks = SDL_GetTicks();
@@ -70,52 +80,79 @@ int main(int argc, char *argv[]) {
                 break;
 
             // BEGIN código del alumno
-            identificador = lista_largo(lista_masas);
+            id_masa = malla_cantidad_resortes(malla);
+
             if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
                 estoy_dibujando = true;
                 iniciox = event.motion.x;
                 inicioy = event.motion.y;
 
-                if(!estoy_sobre_masa(iniciox, inicioy, lista_masas)){
+                if(!estoy_sobre_masa(iniciox, inicioy, malla)){
+                    id_masa = malla_cantidad_resortes(malla);
+                    masa_nueva = masa_crear(id_masa, iniciox, inicioy, 10);
                     crear_masa = true;
-                    masa_nueva = masas_crear(identificador, coordx, coordy);
-                    identificador = lista_largo(lista_masas);
                 }
-                if(estoy_sobre_masa(iniciox, inicioy, lista_masas)){
-                    borrar_masa = true;
+
+                if (estoy_sobre_masa(iniciox, inicioy, malla)){
+                    moviendo_masa = true;
+                    id__ = obtener_id_masa_en_coordenadas(iniciox, inicioy, malla);
                 }
             }
+
+            else if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_RIGHT){
+                iniciox = event.motion.x;
+                inicioy = event.motion.y;
+                
+                if(estoy_sobre_masa(iniciox, inicioy, malla)){
+                    x = iniciox;
+                    y = inicioy;
+                }
+            }
+
             else if(event.type == SDL_MOUSEMOTION) {
                 coordx = event.motion.x;
                 coordy = event.motion.y;
             }
+
+            else if(event.type == SDL_MOUSEMOTION && moviendo_masa){
+                malla_actualizar_coordx(malla, &id__, event.motion.x);
+                malla_actualizar_coordy(malla, &id__, event.motion.y);
+            }
+            else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT && moviendo_masa) {
+                malla_actualizar_coordx(malla, &id__, event.motion.x);
+                malla_actualizar_coordy(malla, &id__, event.motion.y);
+                moviendo_masa = false;
+            }    
             else if(event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
-                estoy_dibujando = false;
                 if(masa_nueva!= NULL && crear_masa){
                     if (iniciox == coordx && inicioy == coordy){
-                        lista_insertar_ultimo(lista_masas, masa_nueva);
-                        identificador = lista_largo(lista_masas);
+                        malla_agregar_masa(malla,masa_nueva);
+                        id_masa = malla_cantidad_resortes(malla);
                         masa_nueva = NULL;
                     }
                     crear_masa = false;
+                    masa_nueva = NULL;
                 }    
-                else if(borrar_masa){
-                    if(iniciox == coordx && inicioy == coordy){
-                        masas_borrar(coordx, coordy, lista_masas);
-                        identificador = lista_largo(lista_masas);
-                    }
-                    borrar_masa = false;
-                    
-                }
             }
 
+            else if(event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_RIGHT){ 
+                if(x >= coordx - MARGEN_ERROR && x <= coordx + MARGEN_ERROR &&
+                y >= coordy - MARGEN_ERROR && y <= coordy + MARGEN_ERROR){
+                    if(estoy_sobre_masa(x, y, malla)){
+                        malla_eliminar_masa_por_coordenadas(malla, x, y);
+                        id_masa = malla_cantidad_masas(malla);
+                    }
+                    x = 0;
+                    y = 0;
+                }
+            }
             // END código del alumno
 
             continue;
         }
         SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
         SDL_RenderClear(renderer);
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0x00);
+        SDL_SetRenderDrawColor(renderer, 0x91, 0x0D, 0xF4, 0x00);
 
         // BEGIN código del alumno
 #ifdef TTF
@@ -124,20 +161,7 @@ int main(int argc, char *argv[]) {
         sprintf(aux, "%03d, %03d", coordx, coordy);
         escribir_texto(renderer, font, aux, VENTANA_ANCHO - 100, VENTANA_ALTO - 34);
 #endif
-
-        if(estoy_dibujando) {
-            SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0x00);
-            SDL_RenderDrawLine(renderer, iniciox, inicioy, coordx, coordy);
-
-            SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0x00, 0x00);
-
-            float ancho = 10;
-            SDL_Rect r1 = {coordx - ancho/2, coordy - ancho/2, ancho, ancho};
-            SDL_RenderDrawRect(renderer, &r1);
-
-            SDL_Rect r2 = {iniciox - ancho/2, inicioy - ancho/2, ancho, ancho};
-            SDL_RenderDrawRect(renderer, &r2);
-        }
+        renderizar_malla(malla, renderer);
         // END código del alumno
 
         SDL_RenderPresent(renderer);
