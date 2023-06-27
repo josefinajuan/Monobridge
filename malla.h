@@ -27,9 +27,9 @@ bool malla_agregar_masa(malla_t* malla, masa_t* masa);
 
 bool malla_agregar_resorte(malla_t* malla, resorte_t* resorte);
 
-void malla_actualizar_coordx(malla_t *malla, size_t* id_masa, float coordx);
+void malla_actualizar_coord(masa_t* masa, float coordx, float coordy);
 
-void malla_actualizar_coordy(malla_t *malla, size_t* id_masa, float coordy);
+masa_t* obtener_masa(const malla_t* malla, float coordx, float coordy);
 
 size_t obtener_id_masa_en_coordenadas(float x, float y, const malla_t* malla);
 

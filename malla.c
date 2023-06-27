@@ -109,50 +109,34 @@ bool malla_agregar_resorte(malla_t* malla, resorte_t* resorte) {
     return lista_insertar_ultimo(malla->lista_resortes, resorte);
 }
 
-void malla_actualizar_coordx(malla_t *malla, size_t* id_masa, float coordx) {
-    size_t cantidad_masas = lista_largo(malla->lista_masas);
-    if (*id_masa >= cantidad_masas) {
-        return;  // ID de masa inválido
-    }
-    
-    lista_iter_t* iter = lista_iter_crear(malla->lista_masas);
-    if (iter == NULL) {
+void malla_actualizar_coord(masa_t* masa, float coordx, float coordy) {
+    if (masa == NULL)
         return;
-    }
 
-    while (!lista_iter_al_final(iter)) {
-        masa_t* masa = lista_iter_ver_actual(iter);
-        if (masa_obtener_id(masa) == *id_masa) {
-            masa_actualizar_coordx(masa,coordx);
-            break;
-        }
-        lista_iter_avanzar(iter);
-    }
-
-    lista_iter_destruir(iter);
+    masa_actualizar_coordx(masa, coordx);
+    masa_actualizar_coordy(masa, coordy);
 }
 
-void malla_actualizar_coordy(malla_t* malla, size_t* id, float nueva_coordy) {
-    size_t cantidad_masas = lista_largo(malla->lista_masas);
-    if (*id >= cantidad_masas) {
-        return;  // ID de masa inválido
-    }
-    
-    lista_iter_t* iter = lista_iter_crear(malla->lista_masas);
-    if (iter == NULL) {
-        return;
-    }
+masa_t* obtener_masa(const malla_t* malla, float coordx, float coordy) {
+    if (malla == NULL)
+        return NULL;
+
+    lista_t* lista_masas = malla->lista_masas;
+    lista_iter_t* iter = lista_iter_crear(lista_masas);
+    if (iter == NULL)
+        return NULL;
 
     while (!lista_iter_al_final(iter)) {
         masa_t* masa = lista_iter_ver_actual(iter);
-        if (masa_obtener_id(masa) == *id) {
-            masa_actualizar_coordy(masa, nueva_coordy);
-            break;
+        if (masa_obtener_coordx(masa) == coordx && masa_obtener_coordy(masa) == coordy) {
+            lista_iter_destruir(iter);
+            return masa;
         }
         lista_iter_avanzar(iter);
     }
 
     lista_iter_destruir(iter);
+    return NULL;
 }
 
 size_t obtener_id_masa_en_coordenadas(float x, float y, const malla_t* malla) {
