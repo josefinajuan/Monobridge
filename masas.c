@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 struct masa{
     size_t id;
@@ -83,6 +84,12 @@ void masa_actualizar_coordx(masa_t* masa, float coordx) {
 
 void masa_actualizar_coordy(masa_t* masa, float coordy) {
     masa->coordy = coordy;
+}
+
+float norma(const masa_t* masa_final, const masa_t* masa_inicial) {
+    float distancia_x = masa_final->coordx - masa_inicial->coordx;
+    float distancia_y = masa_final->coordy - masa_inicial->coordy;
+    return sqrtf(distancia_x * distancia_x + distancia_y * distancia_y);
 }
 
 bool es_fija(const masa_t * masa) {

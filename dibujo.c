@@ -63,3 +63,4 @@ void renderizar_malla(malla_t *malla, SDL_Renderer *renderer) {
 void moviendo_radio_resorte(const masa_t *masa, float x, float y, SDL_Renderer *renderer){
     SDL_RenderDrawLine (renderer, (masa_obtener_coordx(masa)), (masa_obtener_coordy(masa)), x , y );
 }
+

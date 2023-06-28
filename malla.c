@@ -54,7 +54,6 @@ size_t malla_cantidad_resortes(const malla_t* malla) {
 bool estoy_sobre_masa(float coordx, float coordy, const malla_t *malla) {
     lista_iter_t *iter = lista_iter_crear(malla->lista_masas);
     if (iter == NULL) {
-        // Manejar error de creación del iterador
         return false;
     }
 
@@ -139,28 +138,8 @@ masa_t* obtener_masa(const malla_t* malla, float coordx, float coordy) {
     return NULL;
 }
 
-size_t obtener_id_masa_en_coordenadas(float x, float y, const malla_t* malla) {
-    lista_iter_t* iter = lista_iter_crear(malla->lista_masas);
-    if (iter == NULL) {
-        return -1; // Valor inválido para indicar que no se encontró la masa
-    }
-
-    size_t id_masa = 0;
-    while (!lista_iter_al_final(iter)) {
-        masa_t* masa = lista_iter_ver_actual(iter);
-        float coordx = masa_obtener_coordx(masa);
-        float coordy = masa_obtener_coordy(masa);
-
-        if (x >= coordx - MARGEN_ERROR && x <= coordx + MARGEN_ERROR &&
-            y >= coordy - MARGEN_ERROR && y <= coordy + MARGEN_ERROR) {
-            lista_iter_destruir(iter);
-            return id_masa;
-        }
-
-        lista_iter_avanzar(iter);
-        id_masa++;
-    }
-
-    lista_iter_destruir(iter);
-    return -1; // Valor inválido para indicar que no se encontró la masa
+bool son_iguales(int x1, int y1, int x2, int y2) {
+    return x1 == x2 && y1 == y2;
 }
+
+

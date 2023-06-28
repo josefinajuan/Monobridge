@@ -28,6 +28,8 @@ void masa_actualizar_coordx(masa_t* masa, float coordx);
 
 void masa_actualizar_coordy(masa_t* masa, float coordy);
 
+float norma(const masa_t* masa_final, const masa_t* masa_inicial);
+
 bool es_fija(const masa_t * masa);
 
 #endif

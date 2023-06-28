@@ -31,6 +31,6 @@ void malla_actualizar_coord(masa_t* masa, float coordx, float coordy);
 
 masa_t* obtener_masa(const malla_t* malla, float coordx, float coordy);
 
-size_t obtener_id_masa_en_coordenadas(float x, float y, const malla_t* malla);
+bool son_iguales(int x1, int y1, int x2, int y2);
 
 #endif
