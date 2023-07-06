@@ -2,14 +2,12 @@
 #include <stdbool.h>
 
 #include "config.h"
+#include "dibujo.h"
 #include "lista.h"
 #include "resortes.h"
 #include "masas.h"
 #include "malla.h"
-#include "dibujo.h"
-
-#define MARGEN_ERROR 10
-
+#include "simulacion.h"
 
 #ifdef TTF
 #include <SDL2/SDL_ttf.h>
@@ -54,12 +52,16 @@ int main(int argc, char *argv[]) {
 
     // BEGIN código del alumno
 
-    //bool estoy_dibujando = false;
+    float tiempo = 0;
     int coordx = 0, coordy = 0;
     int iniciox, inicioy;
     int x, y;
 
     malla_t* malla = malla_crear();
+    malla_t* malla_simulacion = malla_crear();
+    //instante_t* instante_un_anterior;
+    //instante_t* instante_dos_anteriores;
+    simulacion_t* simulacion;
 
     size_t id_masa;
     size_t id_resorte;
@@ -69,8 +71,12 @@ int main(int argc, char *argv[]) {
     masa_t* masa_moviendose;
     resorte_t* resorte;
 
+
+
+    bool simulando = false;
     bool dibujando = false;
     bool moviendo_masa = false;
+    bool _en_radio = false; 
 
     // END código del alumno
 
@@ -81,30 +87,29 @@ int main(int argc, char *argv[]) {
                 break;
 
             // BEGIN código del alumno
-            id_masa = malla_cantidad_masas(malla);
 
             if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
                 iniciox = event.motion.x;
                 inicioy = event.motion.y;
 
-                if(!estoy_sobre_masa(iniciox, inicioy, malla)){
-                    id_masa = malla_cantidad_masas(malla);
-                    masa_nueva = masa_crear(id_masa, iniciox, inicioy, 15);
-                }
-
-                if(estoy_sobre_masa(iniciox, inicioy, malla)){
+                if(!simulando){
                     masa_moviendose = obtener_masa(malla, iniciox, inicioy);
                     if(masa_moviendose != NULL){
                         moviendo_masa = true;
-                        
                     }
                 }
             }
+               
             else if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_RIGHT){
                 iniciox = event.motion.x;
                 inicioy = event.motion.y;
                 
                 if(estoy_sobre_masa(iniciox, inicioy, malla)){
+                    x = iniciox;
+                    y = inicioy; 
+                }
+
+                if(estoy_sobre_resorte(iniciox, inicioy, malla)){
                     x = iniciox;
                     y = inicioy;
                 }
@@ -114,86 +119,98 @@ int main(int argc, char *argv[]) {
                 coordx = event.motion.x;
                 coordy = event.motion.y;
 
-                if(moviendo_masa && masa_moviendose != NULL){
-                    malla_actualizar_coord(masa_moviendose, coordx, coordy);
+
+                if(moviendo_masa){
+                    malla_mover_masas(malla, masa_moviendose, coordx, coordy);
+                }
+
+                if(dibujando){
+                    float longitud = norma_puntos(masa_obtener_coordx(masa_inicial_dibujando), masa_obtener_coordy(masa_inicial_dibujando),coordx, coordy);
+                    if(en_radio(L0_MAX, longitud)){
+                        _en_radio = true;
+                    }else{
+                        _en_radio = false;
+                    }
                 }
             }
 
             else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
 
-                if(moviendo_masa && masa_moviendose != NULL && !son_iguales(iniciox, inicioy, coordx, coordy)){
-                    malla_actualizar_coord(masa_moviendose,coordx,coordy);
-                    moviendo_masa = false;
-                }
-                
-                if(son_iguales(iniciox, inicioy, coordx, coordy)){
-                    if(estoy_sobre_masa(coordx, coordy, malla)){
-                        moviendo_masa = false;
-                        if(!dibujando){
-                            masa_inicial_dibujando = obtener_masa(malla, coordx, coordy);
-                            dibujando = true;
-                        } else {
-                            masa_final = obtener_masa(malla, coordx, coordy);
-                            if(masa_final != NULL && masa_inicial_dibujando != masa_final) {
-                                float longitud = norma(masa_final, masa_inicial_dibujando);
-                                if (en_radio(L0_MAX, longitud)) {
-                                    size_t id_resorte = malla_cantidad_resortes(malla);
-                                    resorte = resorte_crear(id_resorte, masa_inicial_dibujando, masa_final);
-                                    if (resorte != NULL) {
-                                        malla_agregar_resorte(malla, resorte);
-                                    }
-                                }
-                                dibujando = false;
-                                masa_inicial_dibujando = NULL;
-                            }        
-                        }
-                        
-                    }
-                    else if(!estoy_sobre_masa(iniciox, inicioy, malla)){
-                        if(!dibujando){
-                            id_masa = malla_cantidad_masas(malla);
-                            masa_nueva = masa_crear(id_masa, iniciox, inicioy, 15);
-                            if(masa_nueva != NULL){
-                                malla_agregar_masa(malla,masa_nueva);
-                            }
-                            masa_nueva = NULL;
-                        }
+                moviendo_masa = false;
+                if(!simulando){
+                    if(iniciox == coordx && inicioy == coordy){
                         if(dibujando){
-                            id_masa = malla_cantidad_masas(malla);
-                            masa_final = masa_crear(id_masa, coordx, coordy, 15);
-                            if(masa_inicial_dibujando != masa_final){
-                                float longitud = norma(masa_final, masa_inicial_dibujando);
-                                if(en_radio(L0_MAX, longitud)){
+                            float longitud = norma_puntos(masa_obtener_coordx(masa_inicial_dibujando), masa_obtener_coordy(masa_inicial_dibujando), coordx, coordy);
+                            if(en_radio(L0_MAX, longitud)) {
+                                if(estoy_sobre_masa(coordx, coordy, malla)){
+                                    if(coincidir_masas(masa_inicial_dibujando, coordx, coordy)){
+                                        dibujando = false;
+                                    }else{
+                                        masa_final = obtener_masa(malla, coordx, coordy);
+                                        id_resorte = malla_cantidad_resortes(malla);
+                                        resorte = resorte_crear(id_resorte, masa_inicial_dibujando, masa_final);
+                                        if(resorte!= NULL){
+                                            malla_agregar_resorte(malla, resorte);
+                                        }
+                                        dibujando = false;
+                                    }
+                                }
+                                if(!estoy_sobre_masa(coordx,coordy, malla)){
+                                    id_masa = malla_cantidad_masas(malla);
+                                    masa_final = masa_crear(id_masa, coordx, coordy, 15);
+                                    if(masa_final!= NULL){
+                                        malla_agregar_masa(malla, masa_final);
+                                    }
                                     id_resorte = malla_cantidad_resortes(malla);
-                                    resorte = resorte_crear(id_resorte, masa_inicial_dibujando, masa_nueva);
-                                    if(masa_nueva != NULL && resorte != NULL){
-                                        malla_agregar_masa(malla,masa_nueva);
+                                    resorte = resorte_crear(id_resorte, masa_inicial_dibujando, masa_final);
+                                    if(resorte!= NULL){
                                         malla_agregar_resorte(malla, resorte);
                                     }
-                                    free(masa_final);
-                                    free(resorte);
+                                    dibujando = false;
                                 }
-                                free(masa_final);
                             }
-                            dibujando = false;
-                            masa_inicial_dibujando = NULL;
+                        
+                        } else {
+                            if(estoy_sobre_masa(coordx, coordy, malla)){
+                                masa_inicial_dibujando = obtener_masa(malla, coordx, coordy);
+                                dibujando = true;
+                            }
+                            if(!estoy_sobre_masa(iniciox, inicioy, malla)){
+                                id_masa = malla_cantidad_masas(malla);
+                                masa_nueva = masa_crear(id_masa, iniciox, inicioy, 15);
+                                if(masa_nueva != NULL){
+                                    malla_agregar_masa(malla,masa_nueva);
+                                }
+                                masa_nueva = NULL;
+                            }
                         }
                     }
-                }
-            } 
-
-            else if(event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_RIGHT){ 
-                if(x >= coordx - MARGEN_ERROR && x <= coordx + MARGEN_ERROR &&
-                y >= coordy - MARGEN_ERROR && y <= coordy + MARGEN_ERROR){
-                    if(estoy_sobre_masa(x, y, malla)){
-                        malla_eliminar_masa_por_coordenadas(malla, x, y);
-                        id_masa = malla_cantidad_masas(malla);
-                    }
-                    x = 0;
-                    y = 0;
                 }
             }
-    
+
+            else if(event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_RIGHT){ 
+
+                if(x == coordx && y == coordy){
+                    if(!simulando && !dibujando){
+                        if(estoy_sobre_masa(x, y, malla)){
+                            malla_eliminar_masa_por_coordenadas(malla, x, y);
+                            id_masa = malla_cantidad_masas(malla);
+                            id_resorte = malla_cantidad_resortes(malla);
+                        } 
+                        else if(estoy_sobre_resorte(x, y, malla)){
+                            malla_eliminar_resorte_por_coordenadas(malla, x, y);
+                        }
+                        else{
+                            simulando = true;
+                            copiar_malla(malla, malla_simulacion);
+                            simulacion = simulacion_inicio(malla_simulacion);
+                        }
+                        x = 0;
+                        y = 0;
+                    }
+                }
+            }
+
             // END código del alumno
 
             continue;
@@ -204,15 +221,42 @@ int main(int argc, char *argv[]) {
 
         // BEGIN código del alumno
 #ifdef TTF
-        escribir_texto(renderer, font, "Mono Bridge", 100, 20);
-        char aux[100];
-        sprintf(aux, "%03d, %03d", coordx, coordy);
-        escribir_texto(renderer, font, aux, VENTANA_ANCHO - 100, VENTANA_ALTO - 34);
-#endif  
-        if(dibujando){
-            dibujar_resorte(resorte,renderer);
+        if(!simulando){
+            escribir_texto(renderer, font, "Mono Bridge", 100, 20);
+            char aux[100];
+            sprintf(aux, "%03d, %03d", coordx, coordy);
+            escribir_texto(renderer, font, aux, VENTANA_ANCHO - 100, VENTANA_ALTO - 34);
         }
-        renderizar_malla(malla, renderer);
+        
+        if(simulando){
+            escribir_texto(renderer, font, "Simulando", 200, 20);
+            char aux[100];
+            sprintf(aux, "%03d, %03d", coordx, coordy);
+            escribir_texto(renderer, font, aux, VENTANA_ANCHO - 100, VENTANA_ALTO - 34);
+            char t[100];
+            sprintf(t, "%03f", tiempo);
+            escribir_texto(renderer, font, t, VENTANA_ANCHO - 200, 20);
+        }
+
+#endif  
+        if (!simulando){
+            if(dibujando && _en_radio){
+                moviendo_radio_resorte(masa_inicial_dibujando, coordx, coordy, renderer);
+            }
+            renderizar_malla(malla, renderer);
+        }
+
+        if(simulando && tiempo <= 10){
+            float* vector = obtener_l0_resortes(malla_simulacion);
+            size_t total_ciclos = 10 / (JUEGO_FPS * DT);
+            for (size_t i = 0; i < total_ciclos; i++) {
+                simulacion_agregar(simulacion_instante_uno_anterior(simulacion), simulacion_instante_dos_anteriores(simulacion), vector, simulacion);
+                dibujar_simulacion(simulacion, renderer);
+                tiempo += DT;
+            }
+            simulacion_a_malla(malla_simulacion,simulacion);
+        }
+    
         // END código del alumno
 
         SDL_RenderPresent(renderer);

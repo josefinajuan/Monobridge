@@ -3,10 +3,6 @@
 
 #include "lista.h"
 #include "masas.h"
-#include "malla.h"
-
-#define L0_MAX 3
-#define K_BASE 200
 
 typedef struct resorte resorte_t;
 
@@ -20,8 +16,14 @@ masa_t *resorte_obtener_m1(const resorte_t *resorte);
 
 masa_t *resorte_obtener_m2(const resorte_t *resorte);
 
-resorte_t* resorte_crear(size_t id, const masa_t* masa_inicial, const masa_t* masa_final);
+void resorte_actualizar_l(resorte_t *resorte, float l_inicial);
 
-bool en_radio(float etiqueta, float longitud); 
+bool en_radio(float etiqueta, float longitud);
+
+resorte_t* resorte_crear(size_t id,masa_t* masa_inicial,masa_t* masa_final);
+
+void resorte_destruir(resorte_t* resorte);
+
+void resorte_actualizar_id(resorte_t* resorte, int nuevo_id);
 
 #endif

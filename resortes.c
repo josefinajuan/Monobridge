@@ -1,4 +1,5 @@
 #include "resortes.h"
+#include "config.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -38,12 +39,17 @@ masa_t *resorte_obtener_m2(const resorte_t *resorte)
     return resorte->m2;
 }
 
+void resorte_actualizar_l(resorte_t *resorte, float l_inicial)
+{
+    resorte->lo = l_inicial;
+}
+
 bool en_radio(float etiqueta, float longitud)
 {
     return longitud < etiqueta;
 }
 
-resorte_t *resorte_crear(size_t id, const masa_t *masa_inicial, const masa_t *masa_final)
+resorte_t *resorte_crear(size_t id, masa_t *masa_inicial, masa_t *masa_final)
 {
     if (masa_inicial == NULL || masa_final == NULL)
     {
@@ -63,4 +69,18 @@ resorte_t *resorte_crear(size_t id, const masa_t *masa_inicial, const masa_t *ma
     resorte->m2 = masa_final;
 
     return resorte;
+}
+
+void resorte_destruir(resorte_t *resorte){
+    if (resorte != NULL)
+    {
+        free(resorte);
+    }
+}
+
+void resorte_actualizar_id(resorte_t *resorte, int nuevo_id){
+    if (resorte != NULL)
+    {
+        resorte->id = nuevo_id;
+    }
 }
