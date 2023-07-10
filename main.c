@@ -55,7 +55,6 @@ int main(int argc, char *argv[]) {
     float tiempo = 0;
     int coordx = 0, coordy = 0;
     int iniciox, inicioy;
-    int x, y;
 
     malla_t* malla = malla_crear();
     malla_t* malla_simulacion = malla_crear();
@@ -70,7 +69,6 @@ int main(int argc, char *argv[]) {
     masa_t* masa_nueva;
     masa_t* masa_moviendose;
     resorte_t* resorte;
-
 
 
     bool simulando = false;
@@ -103,22 +101,11 @@ int main(int argc, char *argv[]) {
             else if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_RIGHT){
                 iniciox = event.motion.x;
                 inicioy = event.motion.y;
-                
-                if(estoy_sobre_masa(iniciox, inicioy, malla)){
-                    x = iniciox;
-                    y = inicioy; 
-                }
-
-                if(estoy_sobre_resorte(iniciox, inicioy, malla)){
-                    x = iniciox;
-                    y = inicioy;
-                }
             }
 
             else if(event.type == SDL_MOUSEMOTION) {
                 coordx = event.motion.x;
                 coordy = event.motion.y;
-
 
                 if(moviendo_masa){
                     malla_mover_masas(malla, masa_moviendose, coordx, coordy);
@@ -190,23 +177,22 @@ int main(int argc, char *argv[]) {
 
             else if(event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_RIGHT){ 
 
-                if(x == coordx && y == coordy){
+                if(iniciox == coordx && inicioy == coordy){
                     if(!simulando && !dibujando){
-                        if(estoy_sobre_masa(x, y, malla)){
-                            malla_eliminar_masa_por_coordenadas(malla, x, y);
+                        if(estoy_sobre_masa(iniciox, inicioy, malla)){
+                            malla_eliminar_masa_por_coordenadas(malla, iniciox, inicioy);
                             id_masa = malla_cantidad_masas(malla);
                             id_resorte = malla_cantidad_resortes(malla);
                         } 
-                        else if(estoy_sobre_resorte(x, y, malla)){
-                            malla_eliminar_resorte_por_coordenadas(malla, x, y);
+                        else if(estoy_sobre_resorte(iniciox, inicioy, malla)){
+                            malla_eliminar_resorte_por_coordenadas(malla, iniciox, inicioy);
                         }
                         else{
                             simulando = true;
+                            reacomodar_id(malla);
                             copiar_malla(malla, malla_simulacion);
                             simulacion = simulacion_inicio(malla_simulacion);
                         }
-                        x = 0;
-                        y = 0;
                     }
                 }
             }
@@ -228,7 +214,7 @@ int main(int argc, char *argv[]) {
             escribir_texto(renderer, font, aux, VENTANA_ANCHO - 100, VENTANA_ALTO - 34);
         }
         
-        if(simulando){
+        if(simulando && tiempo <= DURACION_SIMULACION){
             escribir_texto(renderer, font, "Simulando", 200, 20);
             char aux[100];
             sprintf(aux, "%03d, %03d", coordx, coordy);
@@ -245,19 +231,25 @@ int main(int argc, char *argv[]) {
             }
             renderizar_malla(malla, renderer);
         }
-
-        if(simulando && tiempo <= 10){
-            float* vector = obtener_l0_resortes(malla_simulacion);
-            size_t total_ciclos = 10 / (JUEGO_FPS * DT);
-            for (size_t i = 0; i < total_ciclos; i++) {
-                simulacion_agregar(simulacion_instante_uno_anterior(simulacion), simulacion_instante_dos_anteriores(simulacion), vector, simulacion);
-                dibujar_simulacion(simulacion, renderer);
+        else if(simulando && tiempo <= DURACION_SIMULACION){
+            size_t veces =  1.0 / JUEGO_FPS / DT;
+            for(size_t i = 0; i < veces; i++) {
+                simulacion_agregar(simulacion);
+                //simulacion_a_malla(malla_simulacion, simulacion);
+                //dibujar_simulacion(simulacion, renderer);
                 tiempo += DT;
             }
-            simulacion_a_malla(malla_simulacion,simulacion);
+            dibujar_simulacion(simulacion, renderer);
+            renderizar_malla(malla_simulacion, renderer);
+            
         }
-    
-        // END código del alumno
+
+        if(tiempo > DURACION_SIMULACION){
+            tiempo = 0;
+            malla_destruir(malla_simulacion);
+            simulando = false;
+        }
+        //END código del alumno
 
         SDL_RenderPresent(renderer);
         ticks = SDL_GetTicks() - ticks;

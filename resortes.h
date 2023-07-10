@@ -26,4 +26,5 @@ void resorte_destruir(resorte_t* resorte);
 
 void resorte_actualizar_id(resorte_t* resorte, int nuevo_id);
 
+void resorte_actualizar_ids_resortes(lista_iter_t *iter, lista_t *lista_resortes);
 #endif

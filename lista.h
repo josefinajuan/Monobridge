@@ -55,10 +55,7 @@ void lista_destruir(lista_t *lista, void (*destruir_dato)(void *));
 // Pre: la lista fue creada.
 // Post: se llamó a la función visitar una vez por cada elemento de la lista,
 // en orden.
-void lista_recorrer(lista_t *lista,
-                  bool (*visitar)(void *dato, void *extra),
-                  void *extra);
-
+void lista_recorrer(lista_t *lista, bool (*visitar)(void *dato, void *extra),void *extra);
 /*
  * Primitivas de iteración
  */

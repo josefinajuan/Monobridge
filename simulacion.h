@@ -14,31 +14,44 @@ typedef struct datos_resorte datos_resorte_t;
 typedef struct instante instante_t;
 typedef struct simulacion simulacion_t;
 
+
+// A partir de las coordenadas x e y de dos masas calcular longitud resorte
 float calcular_l_actual(float x1, float y1, float x2, float y2);
 
-float calcular_coordy_m(struct instante* uno_anterior, int id_masa);
+float calcular_by(float m, float y_uno_anterior, float y_dos_anteriores, float sumatoria);
 
-float calcular_coordx_m(struct instante* uno_anterior, int id_masa);
+float calcular_bx(float m, float x_uno_anterior, float x_dos_anteriores, float sumatoria);
 
-float calcular_coordy(float y_uno_anterior, float y_dos_anteriores, float l_nueva_uno_anterior, float l_inicial, float sumatoria);
+float calcular_aj(float m);
 
-float calcular_coordx(float x_uno_anterior, float x_dos_anteriores, float l_nueva_uno_anterior, float l_inicial, float sumatoria);
+float calcular_nueva_coordenada_x(instante_t* uno_anterior, instante_t* dos_anteriores,simulacion_t* simulacion, size_t id_masa, float m);
 
-struct instante* calcular_nuevo_instante(struct instante* uno_anterior, struct instante* dos_anteriores, float* vector);
+float calcular_nueva_coordenada_y(instante_t* uno_anterior, instante_t* dos_anteriores, simulacion_t* simulacion, size_t id_masa, float m);
 
-struct instante* crear_instante(malla_t* malla);
+//Recibe dos instantes
+//Calcula y devuelve nuevo instante  
+instante_t* calcular_instante_nuevo(instante_t* uno_anterior, instante_t* dos_anteriores, simulacion_t* simulacion);
 
+struct instante* copiar_instante(const struct instante* original);
+
+//Crea simulacion vacia
 simulacion_t* _simulacion_crear();
 
-simulacion_t* simulacion_crear(struct instante* un_anterior, struct instante* dos_anteriores, simulacion_t* simulacion);
-
-void simulacion_agregar(struct instante* uno_anterior, struct instante* dos_anteriores, float* vector, simulacion_t* simulacion);
-
-void destruir_simulacion(simulacion_t* simulacion);
+//Recibe un instante uno_anterior y dos_anteriores, una simulacion
+//Se crea una simulacion y se agregan los instantes a la estructura
+simulacion_t* simulacion_crear(struct instante* uno_anterior, struct instante* dos_anteriores, struct simulacion* simulacion);
 
 void destruir_instante(struct instante* instante);
 
+void destruir_simulacion(simulacion_t* simulacion);
+
+//Devuelve un puntero a un primer instante creado a partir de una malla 
+struct instante* crear_instante_desde_malla(malla_t* malla);
+
+// Recibe una malla, se crea el primer instante y el segundo y se devuelve una simulacion creada con los instantes adentro
 simulacion_t* simulacion_inicio(malla_t* malla);
+
+void simulacion_agregar(simulacion_t* simulacion);
 
 void simulacion_a_malla(malla_t* malla_simulacion, simulacion_t* simulacion);
 

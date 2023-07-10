@@ -63,7 +63,7 @@ resorte_t *resorte_crear(size_t id, masa_t *masa_inicial, masa_t *masa_final)
     }
 
     resorte->id = id;
-    resorte->k = K_BASE;
+    resorte->k = 0.0;
     resorte->lo = norma(masa_final, masa_inicial);
     resorte->m1 = masa_inicial;
     resorte->m2 = masa_final;
@@ -82,5 +82,16 @@ void resorte_actualizar_id(resorte_t *resorte, int nuevo_id){
     if (resorte != NULL)
     {
         resorte->id = nuevo_id;
+    }
+}
+
+void resorte_actualizar_ids_resortes(lista_iter_t *iter, lista_t *lista_resortes)
+{
+    size_t id_actual = 0;
+    while (!lista_iter_al_final(iter))
+    {
+        resorte_t *resorte = lista_iter_ver_actual(iter);
+        resorte->id = id_actual++;
+        lista_iter_avanzar(iter);
     }
 }

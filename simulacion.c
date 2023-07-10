@@ -22,155 +22,210 @@ struct instante
 {
     struct datos_masa *datos_masas;
     struct datos_resorte *datos_resortes;
-    struct instante* siguiente;
+    size_t cant_masas;
+    size_t cant_resortes;
 };
 
 struct simulacion
-{
-    struct instante* uno_anterior;
-    struct instante* dos_anteriores;
+{   
+    lista_t* instantes;
 };
+
 
 float calcular_l_actual(float x1, float y1, float x2, float y2) {
     float distancia = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
     return distancia;
 }
 
-float calcular_coordy_m(struct instante* uno_anterior, int id_masa) {
-    return uno_anterior->datos_masas[id_masa].y;
-}
-
-float calcular_coordx_m(struct instante* uno_anterior, int id_masa) {
-    return uno_anterior->datos_masas[id_masa].x;
-}
-
-float calcular_coordy(float y_uno_anterior, float y_dos_anteriores, float l_nueva_uno_anterior, float l_inicial, float sumatoria) {
-    
-    float b = (MASA_TOTAL / (DT * DT)) * ((2 * y_uno_anterior) - y_dos_anteriores) + (B / DT) * y_uno_anterior + MASA_TOTAL * G + sumatoria ;
-    float a = (MASA_TOTAL/ (DT * DT))+ (B / DT);
-    
-    float resultado = b/a;
-    
-    return resultado;
+float calcular_by(float m, float y_uno_anterior, float y_dos_anteriores, float sumatoria){
+    float bj = (m /(DT * DT)) * ((2 * y_uno_anterior )- y_dos_anteriores) + (B/DT) * y_uno_anterior + m * G + sumatoria;
+    return bj;
 
 }
 
-float calcular_coordx(float x_uno_anterior, float x_dos_anteriores, float l_nueva_uno_anterior, float l_inicial, float sumatoria) {
-    
-    float b = (MASA_TOTAL / (DT * DT)) * ((2 * x_uno_anterior) - x_dos_anteriores) + (B / DT) * x_uno_anterior  + sumatoria ;
-    float a = (MASA_TOTAL/ (DT * DT))+ (B / DT);
-    
-    float resultado = b/a;
-    
-    return resultado;
+float calcular_bx(float m, float x_uno_anterior, float x_dos_anteriores, float sumatoria){
+    float bj = (m /(DT * DT)) * ((2 * x_uno_anterior )- x_dos_anteriores) + (B/DT) * x_uno_anterior + sumatoria;
+    return bj;
 
 }
 
-struct instante* calcular_nuevo_instante(struct instante* uno_anterior, struct instante* dos_anteriores, float* vector) {
-    int num_masas = 0;
-    int num_resortes = 0;
+float calcular_aj(float m){
+    float aj = m /(DT * DT) + (B/DT);
+    return aj;
+}
 
-    // Iterar sobre los datos de masas hasta encontrar un puntero nulo
-    struct datos_masa* masas_iter = uno_anterior->datos_masas;
-    while (masas_iter != NULL) {
-        num_masas++;
-        masas_iter++;
-    }
+float calcular_nueva_coordenada_x(instante_t* uno_anterior, instante_t* dos_anteriores,simulacion_t* simulacion, size_t id_masa, float m) {
+    float sumatoria_x = 0;
+    float xj_uno_anterior = 0;
+    float xk_uno_anterior = 0;
+    float xj_dos_anteriores = 0;
+    float k_resorte;
 
-    // Iterar sobre los datos de resortes hasta encontrar un puntero nulo
-    struct datos_resorte* resortes_iter = uno_anterior->datos_resortes;
-    while (resortes_iter != NULL) {
-        num_resortes++;
-        resortes_iter++;
-    }
 
-    struct datos_masa* datos_masas_nuevo = malloc(sizeof(struct datos_masa) * num_masas);
-   
 
-    for (size_t i = 0; i < num_masas; i++) {
-        float sumatoriay = 0;
-        float sumatoriax = 0;
-        for(size_t r = 0; r < num_resortes; r++){
-            sumatoriay += (K_BASE * ((uno_anterior->datos_resortes[r].l_inicial) - (uno_anterior->datos_resortes[r].l_nueva))/ uno_anterior->datos_resortes[r].l_nueva) * (calcular_coordx_m(uno_anterior, uno_anterior->datos_resortes[r].id_masa1)) - calcular_coordx_m(uno_anterior, uno_anterior->datos_resortes[r].id_masa2);
-            sumatoriay += (K_BASE * ((uno_anterior->datos_resortes[r].l_inicial) - (uno_anterior->datos_resortes[r].l_nueva))/ uno_anterior->datos_resortes[r].l_nueva) * (calcular_coordy_m(uno_anterior, uno_anterior->datos_resortes[r].id_masa1)) - calcular_coordy_m(uno_anterior, uno_anterior->datos_resortes[r].id_masa2);
+    for (size_t i = 0; i < uno_anterior->cant_masas; i++) {
+        if (i == id_masa) {
+            xj_uno_anterior = uno_anterior->datos_masas[i].x;
+            xj_dos_anteriores = dos_anteriores->datos_masas[i].x;
+            break; // Salir del bucle una vez que se encuentra 
         }
-        float x_nuevo = calcular_coordx(uno_anterior->datos_masas[i].x, dos_anteriores->datos_masas[i].x, uno_anterior->datos_resortes[i].l_nueva, vector[i], sumatoriax);
-        float y_nuevo = calcular_coordy(uno_anterior->datos_masas[i].y, dos_anteriores->datos_masas[i].y, uno_anterior->datos_resortes[i].l_nueva, vector[i], sumatoriay);
-
-        datos_masas_nuevo[i].x = x_nuevo;
-        datos_masas_nuevo[i].y = y_nuevo;
-
-
     }
 
-    struct datos_resorte* datos_resortes_nuevo = malloc(sizeof(struct datos_resorte) * num_resortes);
+    for (size_t i = 0; i < uno_anterior->cant_resortes; i++) {
+        if (uno_anterior->datos_resortes[i].id_masa1 == id_masa) {
+            size_t id_masa2 = uno_anterior->datos_resortes[i].id_masa2;
+            xk_uno_anterior = uno_anterior->datos_masas[id_masa2].x;
+            float l_inicial = uno_anterior->datos_resortes[i].l_inicial;
+            float l_uno_anterior = uno_anterior->datos_resortes[i].l_nueva;
+            k_resorte = K_BASE / pow(uno_anterior->datos_resortes[i].l_inicial, POTENCIA_K);
+        
+            sumatoria_x += k_resorte * ((l_inicial - l_uno_anterior) / l_uno_anterior) * (xj_uno_anterior - xk_uno_anterior);
 
-    for (int i = 0; i < num_resortes; i++) {
-        struct datos_resorte datos_resorte_anterior = uno_anterior->datos_resortes[i];
+        } else if (uno_anterior->datos_resortes[i].id_masa2 == id_masa) {
+            size_t id_masa1 = uno_anterior->datos_resortes[i].id_masa1;
+            xk_uno_anterior = uno_anterior->datos_masas[id_masa1].x;
+            float l_inicial = uno_anterior->datos_resortes[i].l_inicial;
+            float l_uno_anterior = uno_anterior->datos_resortes[i].l_nueva;
+            k_resorte = K_BASE / pow(uno_anterior->datos_resortes[i].l_inicial, POTENCIA_K);
+        
+            sumatoria_x += k_resorte * ((l_inicial - l_uno_anterior) / l_uno_anterior) * (xj_uno_anterior - xk_uno_anterior);
+        }
+    }
+    float bj = calcular_bx(m, xj_uno_anterior, xj_dos_anteriores, sumatoria_x);
+    float aj = calcular_aj(m);
+    float pos_x = bj / aj;
+    
+    return pos_x;
+}
 
-        datos_resortes_nuevo[i].id_masa1 = datos_resorte_anterior.id_masa1;
-        datos_resortes_nuevo[i].id_masa2 = datos_resorte_anterior.id_masa2;
-        datos_resortes_nuevo[i].l_inicial = datos_resorte_anterior.l_inicial;
+float calcular_nueva_coordenada_y(instante_t* uno_anterior, instante_t* dos_anteriores, simulacion_t* simulacion, size_t id_masa, float m) {
+    float sumatoria_y = 0;
+    float yj_uno_anterior = 0;
+    float yk_uno_anterior = 0;
+    float yj_dos_anteriores = 0;
+    float k_resorte;
 
-        float x1 = datos_masas_nuevo[datos_resorte_anterior.id_masa1].x;
-        float y1 = datos_masas_nuevo[datos_resorte_anterior.id_masa1].y;
-        float x2 = datos_masas_nuevo[datos_resorte_anterior.id_masa2].x;
-        float y2 = datos_masas_nuevo[datos_resorte_anterior.id_masa2].y;
-
-        float l_actual_nueva = calcular_l_actual(x1, y1, x2, y2);
-
-        datos_resortes_nuevo[i].l_nueva = l_actual_nueva;
+    for (size_t i = 0; i < uno_anterior->cant_masas; i++) {
+        if (i == id_masa) {
+            yj_uno_anterior = uno_anterior->datos_masas[i].y;
+            yj_dos_anteriores = dos_anteriores->datos_masas[i].y;
+            break; // Salir del bucle una vez que se encuentra 
+        }
     }
 
-    struct instante* nuevo_instante = malloc(sizeof(struct instante));
-    nuevo_instante->datos_masas = datos_masas_nuevo;
-    nuevo_instante->datos_resortes = datos_resortes_nuevo;
-    nuevo_instante->siguiente = NULL;
 
+    for (size_t i = 0; i < uno_anterior->cant_resortes; i++) {
+        if (uno_anterior->datos_resortes[i].id_masa1 == id_masa) {
+            size_t id_masa2 = uno_anterior->datos_resortes[i].id_masa2;
+            yk_uno_anterior = uno_anterior->datos_masas[id_masa2].y;
+            float l_inicial = uno_anterior->datos_resortes[i].l_inicial;
+            float l_uno_anterior = uno_anterior->datos_resortes[i].l_nueva;
+            k_resorte = K_BASE / pow(uno_anterior->datos_resortes[i].l_inicial, POTENCIA_K);
+        
+            sumatoria_y += k_resorte * ((l_inicial - l_uno_anterior) / l_uno_anterior) * (yj_uno_anterior - yk_uno_anterior);
+
+        } else if (uno_anterior->datos_resortes[i].id_masa2 == id_masa) {
+            size_t id_masa1 = uno_anterior->datos_resortes[i].id_masa1;
+            yk_uno_anterior = uno_anterior->datos_masas[id_masa1].y;
+            float l_inicial = uno_anterior->datos_resortes[i].l_inicial;
+            float l_uno_anterior = uno_anterior->datos_resortes[i].l_nueva;
+            k_resorte = K_BASE / pow(uno_anterior->datos_resortes[i].l_inicial, POTENCIA_K);
+        
+            sumatoria_y += k_resorte * ((l_inicial - l_uno_anterior) / l_uno_anterior) * (yj_uno_anterior - yk_uno_anterior);
+        }
+    }
+    float bj = calcular_by(m, yj_uno_anterior, yj_dos_anteriores, sumatoria_y);
+    float aj = calcular_aj(m);
+    float pos_y = bj / aj;
+
+    return pos_y;
+}
+
+instante_t* calcular_instante_nuevo(instante_t* uno_anterior, instante_t* dos_anteriores, simulacion_t* simulacion) {
+    instante_t* nuevo_instante = malloc(sizeof(instante_t));
+    if (nuevo_instante == NULL) return NULL;
+    
+    nuevo_instante->cant_masas = uno_anterior->cant_masas;
+    nuevo_instante->cant_resortes = uno_anterior->cant_resortes;
+    
+    nuevo_instante->datos_masas = malloc(nuevo_instante->cant_masas * sizeof(datos_masa_t));
+    if (nuevo_instante->datos_masas == NULL) {
+        free(nuevo_instante);
+        return NULL;
+    }
+    
+    nuevo_instante->datos_resortes = malloc(nuevo_instante->cant_resortes * sizeof(datos_resorte_t));
+    if (nuevo_instante->datos_resortes == NULL) {
+        free(nuevo_instante->datos_masas);
+        free(nuevo_instante);
+        return NULL;
+    }
+
+    float m = MASA_TOTAL / (uno_anterior->cant_masas);
+    
+    for (size_t i = 0; i < nuevo_instante->cant_masas; i++) {
+        nuevo_instante->datos_masas[i].x = calcular_nueva_coordenada_x(uno_anterior, dos_anteriores, simulacion, i, m);
+        nuevo_instante->datos_masas[i].y = calcular_nueva_coordenada_y(uno_anterior, dos_anteriores, simulacion, i, m);
+    }
+    
+    for (size_t i = 0; i < nuevo_instante->cant_resortes; i++) {
+        nuevo_instante->datos_resortes[i].id_masa1 = uno_anterior->datos_resortes[i].id_masa1;
+        nuevo_instante->datos_resortes[i].id_masa2 = uno_anterior->datos_resortes[i].id_masa2;
+        nuevo_instante->datos_resortes[i].l_inicial = uno_anterior->datos_resortes[i].l_inicial;
+
+        size_t id_masa1 = nuevo_instante->datos_resortes[i].id_masa1;
+        size_t id_masa2 = nuevo_instante->datos_resortes[i].id_masa2;
+
+        float x1 = uno_anterior->datos_masas[id_masa1].x;
+        float y1 = uno_anterior->datos_masas[id_masa1].y;
+        float x2 = uno_anterior->datos_masas[id_masa2].x;
+        float y2 = uno_anterior->datos_masas[id_masa2].y;
+
+        nuevo_instante->datos_resortes[i].l_nueva = calcular_l_actual(x1, y1, x2, y2);
+    }
+    
     return nuevo_instante;
 }
 
-struct instante* crear_instante(malla_t* malla) {
-    int num_masas = malla_cantidad_masas(malla);
-    int num_resortes = malla_cantidad_resortes(malla);
-
-    struct datos_masa* datos_masas = malloc(sizeof(struct datos_masa) * num_masas);
-    struct datos_resorte* datos_resortes = malloc(sizeof(struct datos_resorte) * num_resortes);
-
-    // Copiar datos de las masas
-    for (int i = 0; i < num_masas; i++) {
-        masa_t* masa = malla_obtener_masa_por_id(malla, i);
-        float x = masa_obtener_coordx(masa);
-        float y = masa_obtener_coordy(masa);
-
-        datos_masas[i].x = x;
-        datos_masas[i].y = y;
+struct instante* copiar_instante(const struct instante* original) {
+    if (original == NULL) {
+        return NULL;
     }
 
-    float* vector = obtener_l0_resortes(malla);
-
-    // Copiar datos de los resortes
-    for (int i = 0; i < num_resortes; i++) {
-        resorte_t* resorte = malla_obtener_resorte_por_id(malla, i);
-
-        size_t id_masa1 = malla_resorte_obtener_id_m1(resorte);
-        size_t id_masa2 = malla_resorte_obtener_id_m2(resorte);
-        float l_nueva = vector[i];
-        float l_inicial = malla_resorte_longitud_actual(malla, i);
-
-        datos_resortes[i].id_masa1 = id_masa1;
-        datos_resortes[i].id_masa2 = id_masa2;
-        datos_resortes[i].l_nueva = l_nueva;
-        datos_resortes[i].l_inicial = l_inicial;
+    struct instante* copia = malloc(sizeof(struct instante));
+    if (copia == NULL) {
+        return NULL;
     }
 
-    // Crear el instante
-    struct instante* instante = malloc(sizeof(struct instante));
-    instante->datos_masas = datos_masas;
-    instante->datos_resortes = datos_resortes;
-    instante->siguiente = NULL;
+    copia->cant_masas = original->cant_masas;
+    copia->cant_resortes = original->cant_resortes;
 
-    return instante;
+    copia->datos_masas = malloc(sizeof(struct datos_masa) * copia->cant_masas);
+    if (copia->datos_masas == NULL) {
+        free(copia);
+        return NULL;
+    }
+
+    copia->datos_resortes = malloc(sizeof(struct datos_resorte) * copia->cant_resortes);
+    if (copia->datos_resortes == NULL) {
+        free(copia->datos_masas);
+        free(copia);
+        return NULL;
+    }
+
+    for (size_t i = 0; i < copia->cant_masas; i++) {
+        copia->datos_masas[i].x = original->datos_masas[i].x;
+        copia->datos_masas[i].y = original->datos_masas[i].y;
+    }
+
+    for (size_t i = 0; i < copia->cant_resortes; i++) {
+        copia->datos_resortes[i].id_masa1 = original->datos_resortes[i].id_masa1;
+        copia->datos_resortes[i].id_masa2 = original->datos_resortes[i].id_masa2;
+        copia->datos_resortes[i].l_nueva = original->datos_resortes[i].l_nueva;
+        copia->datos_resortes[i].l_inicial = original->datos_resortes[i].l_inicial;
+    }
+
+    return copia;
 }
 
 simulacion_t* _simulacion_crear() {
@@ -179,34 +234,29 @@ simulacion_t* _simulacion_crear() {
         return NULL;
     }
 
-    simulacion->uno_anterior = NULL;
-    simulacion->dos_anteriores = NULL;
+    simulacion->instantes = lista_crear();
+    if (simulacion->instantes == NULL) {
+        free(simulacion);
+        return NULL;
+    }
 
     return simulacion;
 }
 
-simulacion_t* simulacion_crear(struct instante* uno_anterior, struct instante* dos_anteriores, simulacion_t* simulacion) {
-    uno_anterior->siguiente = dos_anteriores;
-
-    simulacion->uno_anterior = uno_anterior;
-    simulacion->dos_anteriores = dos_anteriores;
+simulacion_t* simulacion_crear(struct instante* uno_anterior, struct instante* dos_anteriores, struct simulacion* simulacion) {
+    lista_insertar_ultimo(simulacion->instantes, dos_anteriores);
+    lista_insertar_ultimo(simulacion->instantes, uno_anterior);
 
     return simulacion;
 }
 
-void simulacion_agregar(struct instante* uno_anterior, struct instante* dos_anteriores, float* vector, simulacion_t* simulacion) {    // Crear el nuevo instante utilizando la función calcular_nuevo_instante
-    struct instante* nuevo_instante = calcular_nuevo_instante(uno_anterior, dos_anteriores, vector);
-
-    // Liberar los datos y la memoria asociada al instante dos_anterior actual
-    free(dos_anteriores->datos_masas);
-    free(dos_anteriores->datos_resortes);
-    free(dos_anteriores);
-
-    nuevo_instante->siguiente = uno_anterior;
-
-    simulacion->dos_anteriores = uno_anterior;
-
-    simulacion->uno_anterior = nuevo_instante;
+void destruir_instante(struct instante* instante) {
+    if (instante == NULL) {
+        return;
+    }
+    free(instante->datos_resortes);
+    free(instante->datos_masas);
+    free(instante);
 }
 
 void destruir_simulacion(simulacion_t* simulacion) {
@@ -214,71 +264,110 @@ void destruir_simulacion(simulacion_t* simulacion) {
         return;
     }
 
-    struct instante* uno_anterior = simulacion->uno_anterior;
-    struct instante* dos_anteriores = simulacion->dos_anteriores;
-
-    while (uno_anterior != NULL) {
-        struct instante* siguiente_uno = uno_anterior->siguiente;
-        destruir_instante(uno_anterior);
-        uno_anterior = siguiente_uno;
-    }
-
-    while (dos_anteriores != NULL) {
-        struct instante* siguiente_dos = dos_anteriores->siguiente;
-        destruir_instante(dos_anteriores);
-        dos_anteriores = siguiente_dos;
-    }
-
-    free(simulacion);
-}
-
-void destruir_instante(struct instante* instante) {
-    if (instante == NULL) {
+    lista_iter_t* iter = lista_iter_crear(simulacion->instantes);
+    if (iter == NULL) {
         return;
     }
 
-    free(instante->datos_masas);
-    free(instante->datos_resortes);
-    free(instante);
+    while (!lista_iter_al_final(iter)) {
+        struct instante* instante = lista_iter_ver_actual(iter);
+        destruir_instante(instante);
+        lista_iter_avanzar(iter);
+    }
+
+    lista_iter_destruir(iter);
+    lista_destruir(simulacion->instantes, NULL);
+    free(simulacion);
+}
+
+struct instante* crear_instante_desde_malla(malla_t* malla) {
+    struct instante* nuevo_instante = (struct instante*) malloc(sizeof(struct instante));
+    if (nuevo_instante == NULL) {
+        return NULL;
+    }
+
+    // Obtener la cantidad de masas en la malla
+    size_t num_masas = malla_cantidad_masas(malla);
+
+    // Asignar memoria para los datos de masas
+    nuevo_instante->datos_masas = (struct datos_masa*)malloc(sizeof(struct datos_masa) * num_masas);
+    if (nuevo_instante->datos_masas == NULL) {
+        free(nuevo_instante);
+        return NULL;
+    }
+
+    // Asignar los datos de las masas
+    for (size_t i = 0; i < num_masas; i++) {
+        nuevo_instante->datos_masas[i].x = malla_masa_obtener_coordx(malla_obtener_masa_por_id(malla, i));
+        nuevo_instante->datos_masas[i].y = malla_masa_obtener_coordy(malla_obtener_masa_por_id(malla, i));
+    }
+
+    // Obtener la cantidad de resortes en la malla
+    size_t num_resortes = malla_cantidad_resortes(malla);
+
+    // Asignar memoria para los datos de resortes
+    nuevo_instante->datos_resortes = (struct datos_resorte*)malloc(sizeof(struct datos_resorte) * num_resortes);
+    if (nuevo_instante->datos_resortes == NULL) {
+        free(nuevo_instante->datos_masas);
+        free(nuevo_instante);
+        return NULL;
+    }
+
+    // Asignar los datos de los resortes
+    for (size_t i = 0; i < num_resortes; i++) {
+        nuevo_instante->datos_resortes[i].id_masa1 = malla_obtener_id_masa(malla_id_resorte_masa1(malla, i));
+        nuevo_instante->datos_resortes[i].id_masa2 = malla_obtener_id_masa(malla_id_resorte_masa2(malla, i));
+        nuevo_instante->datos_resortes[i].l_nueva = malla_resorte_longitud_actual(malla, i);
+        nuevo_instante->datos_resortes[i].l_inicial = malla_resorte_longitud_actual(malla, i);
+    }
+
+    nuevo_instante->cant_masas = num_masas;
+    nuevo_instante->cant_resortes = num_resortes;
+
+    return nuevo_instante;
 }
 
 simulacion_t* simulacion_inicio(malla_t* malla) {
-    // Crear la simulación
     simulacion_t* simulacion = _simulacion_crear();
     if (simulacion == NULL) {
         return NULL;
     }
 
-    // Crear el primer instante desde la malla
-    struct instante* primer_instante = crear_instante(malla);
+    struct instante* primer_instante = crear_instante_desde_malla(malla);
     if (primer_instante == NULL) {
         destruir_simulacion(simulacion);
         return NULL;
     }
 
-    // Crear el segundo instante igual al primero
-    struct instante* segundo_instante = crear_instante(malla);
+    struct instante* segundo_instante = copiar_instante(primer_instante);
     if (segundo_instante == NULL) {
         destruir_instante(primer_instante);
         destruir_simulacion(simulacion);
         return NULL;
     }
 
-    // Establecer los instantes en la simulación
-    simulacion_crear(primer_instante, segundo_instante, simulacion);
+    simulacion = simulacion_crear(primer_instante, segundo_instante, simulacion);
 
     return simulacion;
 }
 
-void simulacion_a_malla(malla_t* malla_simulacion, simulacion_t* simulacion) {
-    // Obtener el primer instante de la simulación
-    struct instante* uno_anterior = simulacion->uno_anterior;
+void simulacion_agregar(simulacion_t* simulacion) {
+    struct instante* nuevo_instante = calcular_instante_nuevo(simulacion_instante_uno_anterior(simulacion), simulacion_instante_dos_anteriores(simulacion), simulacion);
+    lista_insertar_ultimo(simulacion->instantes, nuevo_instante);
+    struct instante* ultimo_instante = lista_borrar_primero(simulacion->instantes);
+    destruir_instante(ultimo_instante);
+}
 
-    // Obtener las listas de resortes y masas de la malla simulación
+void simulacion_a_malla(malla_t* malla_simulacion, simulacion_t* simulacion) {
+    if (malla_simulacion == NULL || simulacion == NULL) {
+        return;
+    }
+
+    struct instante* uno_anterior = simulacion_instante_uno_anterior(simulacion);
+
     lista_t* lista_resortes = malla_obtener_lista_resortes(malla_simulacion);
     lista_t* lista_masas = malla_obtener_lista_masas(malla_simulacion);
 
-    // Copiar los datos de masas en la malla simulación
     struct datos_masa* datos_masas = uno_anterior->datos_masas;
     lista_iter_t* iter_masas = lista_iter_crear(lista_masas);
     if (iter_masas == NULL) {
@@ -290,11 +379,11 @@ void simulacion_a_malla(malla_t* malla_simulacion, simulacion_t* simulacion) {
         malla_actualizar_coord(masa, datos_masas->x, datos_masas->y);
 
         lista_iter_avanzar(iter_masas);
+        datos_masas++;
     }
 
     lista_iter_destruir(iter_masas);
 
-    // Copiar los datos de resortes en la malla simulación
     struct datos_resorte* datos_resortes = uno_anterior->datos_resortes;
     lista_iter_t* iter_resortes = lista_iter_crear(lista_resortes);
     if (iter_resortes == NULL) {
@@ -306,23 +395,46 @@ void simulacion_a_malla(malla_t* malla_simulacion, simulacion_t* simulacion) {
         malla_resorte_actualizar_l0(resorte, datos_resortes->l_inicial);
 
         lista_iter_avanzar(iter_resortes);
+        datos_resortes++;
     }
 
     lista_iter_destruir(iter_resortes);
 }
 
 struct instante* simulacion_instante_uno_anterior(simulacion_t* simulacion) {
-    if (simulacion == NULL) {
+    if (simulacion == NULL || lista_esta_vacia(simulacion->instantes)) {
         return NULL;
     }
-    return simulacion->uno_anterior;
+
+    lista_iter_t* iter = lista_iter_crear(simulacion->instantes);
+    if (iter == NULL) {
+        return NULL;
+    }
+
+    struct instante* uno_anterior = NULL;
+    while (!lista_iter_al_final(iter)) {
+        uno_anterior = lista_iter_ver_actual(iter);
+        lista_iter_avanzar(iter);
+    }
+
+    lista_iter_destruir(iter);
+    return uno_anterior;
 }
 
 struct instante* simulacion_instante_dos_anteriores(simulacion_t* simulacion) {
-    if (simulacion == NULL) {
+    if (simulacion == NULL || lista_largo(simulacion->instantes) < 2) {
         return NULL;
     }
-    return simulacion->dos_anteriores;
+
+    lista_iter_t* iter = lista_iter_crear(simulacion->instantes);
+    if (iter == NULL) {
+        return NULL;
+    }
+
+    struct instante* dos_anteriores = lista_iter_ver_actual(iter);
+    lista_iter_destruir(iter);
+
+    return dos_anteriores;
 }
 
 void dibujar_masa_simulacion(const struct datos_masa *masa, SDL_Renderer *renderer) {
@@ -364,9 +476,8 @@ void dibujar_instante_simulacion(const struct instante *instante, SDL_Renderer *
 }
 
 void dibujar_simulacion(struct simulacion *simulacion, SDL_Renderer *renderer) {
-    struct instante *uno_anterior = simulacion->uno_anterior;
+    struct instante *uno_anterior = simulacion_instante_uno_anterior(simulacion);
 
     // Dibujar instante uno_anterior
     dibujar_instante_simulacion(uno_anterior, renderer);
 }
-

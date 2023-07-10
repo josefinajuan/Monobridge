@@ -150,62 +150,63 @@ bool malla_eliminar_masa_por_coordenadas(malla_t* malla, float coordx, float coo
 
     while (!lista_iter_al_final(iter)) {
         masa_t* masa = lista_iter_ver_actual(iter);
-        float masa_coordx = masa_obtener_coordx(masa);
-        float masa_coordy = masa_obtener_coordy(masa);
+        if(!es_fija(masa)){
+            float masa_coordx = masa_obtener_coordx(masa);
+            float masa_coordy = masa_obtener_coordy(masa);
 
-        if (coordx >= masa_coordx - MARGEN_ERROR && coordx <= masa_coordx + MARGEN_ERROR &&
-            coordy >= masa_coordy - MARGEN_ERROR && coordy <= masa_coordy + MARGEN_ERROR) {
+            if (coordx >= masa_coordx - MARGEN_ERROR && coordx <= masa_coordx + MARGEN_ERROR &&
+                coordy >= masa_coordy - MARGEN_ERROR && coordy <= masa_coordy + MARGEN_ERROR) {
 
-            // Eliminar los resortes asociados a la masa
-            lista_iter_t* iter_resortes = lista_iter_crear(malla->lista_resortes);
-            if (iter_resortes == NULL) {
-                lista_iter_destruir(iter);
-                return true;
-            }
-
-            while (!lista_iter_al_final(iter_resortes)) {
-                resorte_t* resorte = lista_iter_ver_actual(iter_resortes);
-                masa_t* masa_inicio = resorte_obtener_m1(resorte);
-                masa_t* masa_fin = resorte_obtener_m2(resorte);
-
-                if (masa == masa_inicio || masa == masa_fin) {
-                    lista_iter_borrar(iter_resortes);
-                    resorte_destruir(resorte);
-                } else {
-                    lista_iter_avanzar(iter_resortes);
+                // Eliminar los resortes asociados a la masa
+                lista_iter_t* iter_resortes = lista_iter_crear(malla->lista_resortes);
+                if (iter_resortes == NULL) {
+                    lista_iter_destruir(iter);
+                    return true;
                 }
-            }
 
-            lista_iter_destruir(iter_resortes);
+                while (!lista_iter_al_final(iter_resortes)) {
+                    resorte_t* resorte = lista_iter_ver_actual(iter_resortes);
+                    masa_t* masa_inicio = resorte_obtener_m1(resorte);
+                    masa_t* masa_fin = resorte_obtener_m2(resorte);
 
-            // Actualizar los IDs de los resortes restantes en lista_resortes
-            lista_iter_t* iter_actualizado = lista_iter_crear(malla->lista_resortes);
-            if (iter_actualizado == NULL) {
+                    if (masa == masa_inicio || masa == masa_fin) {
+                        lista_iter_borrar(iter_resortes);
+                        resorte_destruir(resorte);
+                    } else {
+                        lista_iter_avanzar(iter_resortes);
+                    }
+                }
+
+                lista_iter_destruir(iter_resortes);
+
+                // Actualizar los IDs de los resortes restantes en lista_resortes
+                lista_iter_t* iter_actualizado = lista_iter_crear(malla->lista_resortes);
+                if (iter_actualizado == NULL) {
+                    lista_iter_destruir(iter);
+                    return true;
+                }
+
+                int nuevo_id = 0;
+                while (!lista_iter_al_final(iter_actualizado)) {
+                    resorte_t* resorte = lista_iter_ver_actual(iter_actualizado);
+                    resorte_actualizar_id(resorte, nuevo_id);
+                    nuevo_id++;
+                    lista_iter_avanzar(iter_actualizado);
+                }
+
+                lista_iter_destruir(iter_actualizado);
+
+                // Borrar la masa y actualizar los IDs de las masas restantes
+                lista_iter_borrar(iter);
+                masa_actualizar_ids_masa(iter, malla->lista_masas);
+
                 lista_iter_destruir(iter);
                 return true;
             }
 
-            int nuevo_id = 0;
-            while (!lista_iter_al_final(iter_actualizado)) {
-                resorte_t* resorte = lista_iter_ver_actual(iter_actualizado);
-                resorte_actualizar_id(resorte, nuevo_id);
-                nuevo_id++;
-                lista_iter_avanzar(iter_actualizado);
-            }
-
-            lista_iter_destruir(iter_actualizado);
-
-            // Borrar la masa y actualizar los IDs de las masas restantes
-            lista_iter_borrar(iter);
-            masa_actualizar_ids_masa(iter, malla->lista_masas);
-
-            lista_iter_destruir(iter);
-            return true;
         }
-
         lista_iter_avanzar(iter);
     }
-
     lista_iter_destruir(iter);
     return false;
 }
@@ -398,31 +399,6 @@ lista_t* malla_obtener_lista_resortes(malla_t* malla) {
     return malla->lista_resortes;
 }
 
-float* obtener_l0_resortes(malla_t* malla) {
-    size_t cantidad_resortes = malla_cantidad_resortes(malla);
-    float* l0_vector = malloc(cantidad_resortes * sizeof(float));
-    
-    if (l0_vector == NULL) {
-        // Manejo del error en caso de fallo de asignación de memoria
-        return NULL;
-    }
-    
-    lista_iter_t* iter = lista_iter_crear(malla_obtener_lista_resortes(malla));
-    size_t i = 0;
-    
-    while (!lista_iter_al_final(iter)) {
-        struct resorte* resorte = lista_iter_ver_actual(iter);
-        l0_vector[i] = resorte_obtener_lo(resorte);
-        
-        lista_iter_avanzar(iter);
-        i++;
-    }
-    
-    lista_iter_destruir(iter);
-    
-    return l0_vector;
-}
-
 void liberar_vector(float* vector) {
     free(vector);
 }
@@ -569,4 +545,35 @@ size_t malla_resorte_obtener_id_m2(const resorte_t* resorte) {
 
     return masa_obtener_id(resorte_obtener_m2(resorte));
 }
+
+size_t malla_obtener_id_masa(const masa_t* masa) {
+    // Verificar si el puntero de masa es válido
+    if (masa == NULL) {
+        return -1;  // Valor de ID inválido
+    }
+
+    // Obtener el ID de la masa
+    size_t id_masa = masa_obtener_id(masa);
+
+    return id_masa;
+}
+
+void reacomodar_id(struct malla *malla)
+{
+    if (malla == NULL)
+    {
+        return;
+    }
+    // Asignar nuevos IDs a las masas de forma creciente
+    lista_iter_t *iter_masas = lista_iter_crear(malla->lista_masas);
+    masa_actualizar_ids_masa(iter_masas, malla->lista_masas);
+    lista_iter_destruir(iter_masas);
+
+    // Asignar nuevos IDs a los resortes de forma creciente
+    lista_iter_t *iter_resortes = lista_iter_crear(malla->lista_resortes);
+    resorte_actualizar_ids_resortes(iter_resortes, malla->lista_resortes);
+    lista_iter_destruir(iter_resortes);
+}
+
+
 

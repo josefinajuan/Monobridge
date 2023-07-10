@@ -10,7 +10,10 @@
 struct masa
 {
     size_t id;
-    float coordx, coordy, tam;
+    float coordx;
+    float coordy;
+    float tam;
+    float masa;
     bool es_fija;
 };
 
@@ -24,7 +27,24 @@ struct masa *masa_crear(size_t id, float x, float y, float tam)
     m->coordx = x;
     m->coordy = y;
     m->tam = tam;
+    m->masa = 0.0;
     m->es_fija = false;
+
+    return m;
+}
+
+struct masa* masa_crear_fija(size_t id, float x, float y, float tam){
+    
+    struct masa *m = malloc(sizeof(struct masa));
+    if (m == NULL)
+        return NULL;
+
+    m->id = id;
+    m->coordx = x;
+    m->coordy = y;
+    m->tam = tam;
+    m->masa = 0.0;
+    m->es_fija = true;
 
     return m;
 }

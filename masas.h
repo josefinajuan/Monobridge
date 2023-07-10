@@ -10,6 +10,8 @@ typedef struct masa masa_t;
 
 struct masa* masa_crear(size_t id, float x, float y, float tam);
 
+struct masa* masa_crear_fija(size_t id, float x, float y, float tam);
+
 float masa_obtener_coordy(const masa_t *masa);
 
 float masa_obtener_coordx(const masa_t *masa);
@@ -35,5 +37,6 @@ float norma_puntos(float x1, float y1, float x2, float y2);
 float norma(const masa_t* masa_final, const masa_t* masa_inicial);
 
 bool es_fija(const masa_t * masa);
+
 
 #endif

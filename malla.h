@@ -75,4 +75,8 @@ size_t malla_resorte_obtener_id_m1(const resorte_t* resorte);
 
 size_t malla_resorte_obtener_id_m2(const resorte_t* resorte);
 
+size_t malla_obtener_id_masa(const masa_t* masa);
+
+void reacomodar_id(struct malla *malla);
+
 #endif
