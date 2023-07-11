@@ -344,7 +344,7 @@ bool malla_masas_en_radio(malla_t* malla, masa_t* masa, float l0_max) {
     return true; // Todos los resortes cumplen con el rango
 }
 
-bool malla_mover_masas(malla_t* malla, masa_t* masa, float coordx, float coordy) {
+bool malla_mover_masas(malla_t* malla, masa_t* masa, float coordx, float coordy, float l0_max) {
     bool tiene_resortes = false;
 
     lista_iter_t* iter = lista_iter_crear(malla->lista_resortes);
@@ -360,7 +360,7 @@ bool malla_mover_masas(malla_t* malla, masa_t* masa, float coordx, float coordy)
         if (masa_inicio == masa || masa_fin == masa) {
             tiene_resortes = true;
             float longitud = norma_puntos(masa_obtener_coordx(masa_inicio), masa_obtener_coordy(masa_inicio), masa_obtener_coordx(masa_fin), masa_obtener_coordy(masa_fin));
-            if (longitud > L0_MAX) {
+            if (longitud > l0_max) {
                 lista_iter_destruir(iter);
                 return false; // Se encontró un resorte fuera del rango
             }
@@ -384,7 +384,7 @@ bool malla_mover_masas(malla_t* malla, masa_t* masa, float coordx, float coordy)
     masa_actualizar_coordx(masa, coordx);
     masa_actualizar_coordy(masa, coordy);
 
-    if (!malla_masas_en_radio(malla, masa, L0_MAX)) {
+    if (!malla_masas_en_radio(malla, masa, L0_MAX/FACTOR_ESCALA)) {
         malla_actualizar_coord(masa, iniciox, inicioy);
         return false;
     } 

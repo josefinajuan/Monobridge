@@ -1,12 +1,13 @@
-#include "masas.h"
+#include "dibujo.h"
+
 #include "lista.h"
-#include "resortes.h"
 #include "malla.h"
+#include "config.h"
+
 #include <SDL2/SDL.h>
-#include <math.h>
 
 void dibujar_masa(masa_t *masa, SDL_Renderer *renderer) {
-    SDL_Rect r1 = {((masa_obtener_coordx(masa)) - (masa_obtener_tam(masa)) / 2), ((masa_obtener_coordy(masa)) - (masa_obtener_tam(masa)) / 2), (masa_obtener_tam(masa)), (masa_obtener_tam(masa))};
+    SDL_Rect r1 = {((masa_obtener_coordx(masa)) - (masa_obtener_tam(masa)) / 2)*FACTOR_ESCALA, ((masa_obtener_coordy(masa)) - (masa_obtener_tam(masa)) / 2)*FACTOR_ESCALA, (masa_obtener_tam(masa))*FACTOR_ESCALA, (masa_obtener_tam(masa))*FACTOR_ESCALA};
     SDL_RenderDrawRect(renderer, &r1);
 }
 
@@ -23,8 +24,8 @@ void dibujar_resorte(resorte_t* resorte, SDL_Renderer* renderer) {
     float x2 = masa_obtener_coordx(masa_final);
     float y2 = masa_obtener_coordy(masa_final);
 
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
-    SDL_RenderDrawLine(renderer, (int)x1, (int)y1, (int)x2, (int)y2);
+    SDL_SetRenderDrawColor(renderer, 0xc7, 0x00, 0x39, 0xFF);
+    SDL_RenderDrawLine(renderer, (int)(x1*FACTOR_ESCALA), (int)(y1*FACTOR_ESCALA), (int)(x2*FACTOR_ESCALA), (int)(y2*FACTOR_ESCALA));
 }
 
 void dibujar_lista_masas(malla_t *malla, SDL_Renderer *renderer) {
@@ -47,7 +48,7 @@ void dibujar_lista_resortes(malla_t *malla, SDL_Renderer *renderer) {
     lista_iter_destruir(l_iter);
 }
 
-void renderizar_malla(malla_t *malla, SDL_Renderer *renderer) {
+void mostrar_malla(malla_t *malla, SDL_Renderer *renderer) {
     dibujar_lista_masas(malla, renderer);
     dibujar_lista_resortes(malla, renderer);
 }
@@ -62,5 +63,5 @@ void moviendo_radio_resorte(const masa_t *masa, float x, float y, SDL_Renderer *
 
     SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
 
-    SDL_RenderDrawLine(renderer, (int)x1, (int)y1, (int)x, (int)y);
+    SDL_RenderDrawLine(renderer, (int)(x1*FACTOR_ESCALA), (int)(y1*FACTOR_ESCALA), (int)(x*FACTOR_ESCALA), (int)(y*FACTOR_ESCALA));
 }

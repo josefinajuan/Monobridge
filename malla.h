@@ -41,7 +41,7 @@ void malla_resorte_actualizar_l0(resorte_t* resorte, float l_inicial);
 
 bool malla_masas_en_radio(malla_t* malla, masa_t* masa, float l0);
 
-bool malla_mover_masas(malla_t* malla, masa_t* masa, float coordx, float coordy);
+bool malla_mover_masas(malla_t* malla, masa_t* masa, float coordx, float coordy, float l0_max);
 
 masa_t *obtener_masa(const malla_t *malla, float coordx, float coordy);
 

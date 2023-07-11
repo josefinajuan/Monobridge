@@ -7,8 +7,6 @@
 #include <math.h>
 
 #include "malla.h"
-#include "masas.h"
-#include "resortes.h"
 #include "lista.h"
 
 void dibujar_masa(masa_t *masa, SDL_Renderer *renderer);
@@ -19,7 +17,7 @@ void dibujar_lista_masas(malla_t *malla, SDL_Renderer *renderer);
 
 void dibujar_lista_resortes(malla_t *malla, SDL_Renderer *renderer);
 
-void renderizar_malla(malla_t *malla, SDL_Renderer *renderer);
+void mostrar_malla(malla_t *malla, SDL_Renderer *renderer);
 
 void moviendo_radio_resorte(const masa_t *masa, float x, float y, SDL_Renderer *renderer);
 

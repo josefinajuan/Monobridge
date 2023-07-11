@@ -51,7 +51,7 @@ struct instante* crear_instante_desde_malla(malla_t* malla);
 // Recibe una malla, se crea el primer instante y el segundo y se devuelve una simulacion creada con los instantes adentro
 simulacion_t* simulacion_inicio(malla_t* malla);
 
-void simulacion_agregar(simulacion_t* simulacion);
+void simulacion_agregar(simulacion_t* simulacion, malla_t* malla_simulacion);
 
 void simulacion_a_malla(malla_t* malla_simulacion, simulacion_t* simulacion);
 
@@ -59,14 +59,12 @@ struct instante* simulacion_instante_uno_anterior(simulacion_t* simulacion);
 
 struct instante* simulacion_instante_dos_anteriores(simulacion_t* simulacion);
 
-void dibujar_masa_simulacion(const struct datos_masa *masa, SDL_Renderer *renderer);
+void dibujar_masa_simulacion(const struct datos_masa* masa, SDL_Renderer *renderer) ;
 
-void dibujar_resorte_simulacion(const struct datos_resorte *resorte, SDL_Renderer *renderer, const struct datos_masa *masas);
+void dibujar_resorte_simulacion(const struct datos_resorte* resorte, SDL_Renderer *renderer, const struct datos_masa *masas);
 
 void dibujar_instante_simulacion(const struct instante *instante, SDL_Renderer *renderer);
 
-void dibujar_simulacion(struct simulacion *simulacion, SDL_Renderer *renderer);
-
-
+void simular(struct simulacion *simulacion, SDL_Renderer *renderer);
 
 #endif

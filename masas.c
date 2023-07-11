@@ -87,8 +87,8 @@ void masa_borrar(masa_t *masa)
 
 bool coincidir_masas(const masa_t *masa, float coordx, float coordy)
 {
-    return (coordx >= masa->coordx - MARGEN_ERROR && coordx <= masa->coordx + MARGEN_ERROR &&
-            coordy >= masa->coordy - MARGEN_ERROR && coordy <= masa->coordy + MARGEN_ERROR);
+    return (coordx >= (masa->coordx - MARGEN_ERROR) && coordx <= (masa->coordx + MARGEN_ERROR) &&
+            coordy >= (masa->coordy - MARGEN_ERROR) && coordy <= (masa->coordy + MARGEN_ERROR));
 }
 
 bool eliminar_masa_de_lista(masa_t *masa, lista_t *lista_masas)
