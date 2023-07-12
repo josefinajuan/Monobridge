@@ -264,12 +264,42 @@ void malla_eliminar_resorte_por_coordenadas(malla_t* malla, float x, float y) {
     }
 }
 
-bool malla_agregar_masa(malla_t* malla, masa_t* masa) {
-    return lista_insertar_ultimo(malla->lista_masas, masa);
+masa_t* malla_masa_nueva(malla_t* malla, size_t id_masa, float coordx, float coordy, float tam){
+    
+    struct masa* masa_final = masa_crear(id_masa, coordx, coordy, tam);
+    if(masa_final == NULL){
+        return NULL;
+    }
+    if(!lista_insertar_ultimo(malla->lista_masas, masa_final)){
+        return NULL;
+    }
+    
+    return masa_final;
 }
+     
+masa_t* malla_masa_nueva_fija(malla_t* malla, size_t id_masa, float coordx, float coordy, float tam){
+    
+    struct masa* masa_final = masa_crear_fija(id_masa, coordx, coordy, tam);
+    if(masa_final == NULL){
+        return NULL;
+    }
+    if(!lista_insertar_ultimo(malla->lista_masas, masa_final)){
+        return NULL;
+    }
+    
+    return masa_final;
+}
+    
+resorte_t* malla_resorte_nuevo(malla_t* malla, size_t id_resorte, struct masa* masa1, struct masa* masa2) {
+    resorte_t* resorte = resorte_crear(id_resorte, masa1, masa2);
+    if(resorte == NULL){
+        return NULL;
+    }
+    if(!lista_insertar_ultimo(malla->lista_resortes, resorte)){
+        return NULL;
+    }
 
-bool malla_agregar_resorte(malla_t* malla, resorte_t* resorte) {
-    return lista_insertar_ultimo(malla->lista_resortes, resorte);
+    return resorte; 
 }
 
 masa_t* obtener_masa(const malla_t* malla, float coordx, float coordy) {
@@ -399,10 +429,6 @@ lista_t* malla_obtener_lista_resortes(malla_t* malla) {
     return malla->lista_resortes;
 }
 
-void liberar_vector(float* vector) {
-    free(vector);
-}
-
 masa_t* malla_obtener_masa_por_id(malla_t* malla, size_t id) {
     lista_iter_t* iter = lista_iter_crear(malla->lista_masas);
     if (iter == NULL) {
@@ -485,6 +511,14 @@ float malla_masa_obtener_coordy(masa_t* masa) {
     return masa_obtener_coordy(masa);
 }
 
+float malla_masa_obtener_tam(masa_t* masa){
+    return masa_obtener_tam(masa);
+}
+
+float malla_masa_obtener_masa(masa_t* masa){
+    return masa_obtener_masa(masa);
+}
+
 void copiar_malla(malla_t* malla_origen, malla_t* malla_destino) {
     // Verificar si la malla de origen y destino son válidas
     if (malla_origen == NULL || malla_destino == NULL) {
@@ -558,6 +592,14 @@ size_t malla_obtener_id_masa(const masa_t* masa) {
     return id_masa;
 }
 
+size_t malla_resorte_obtener_id(const resorte_t* resorte){
+    return resorte_obtener_id(resorte);
+}
+
+float malla_resorte_obtener_lo(const resorte_t* resorte){
+    return resorte_obtener_lo(resorte);
+}
+
 void reacomodar_id(struct malla *malla)
 {
     if (malla == NULL)
@@ -575,5 +617,24 @@ void reacomodar_id(struct malla *malla)
     lista_iter_destruir(iter_resortes);
 }
 
+bool coincidir_masas(const masa_t *masa, float coordx, float coordy) {
+    return (coordx >= (masa_obtener_coordx(masa)- MARGEN_ERROR) && coordx <= (masa_obtener_coordx(masa) + MARGEN_ERROR) &&
+            coordy >=  (masa_obtener_coordy(masa)- MARGEN_ERROR) && coordy <= (masa_obtener_coordy(masa)+ MARGEN_ERROR));
+}
 
+bool en_radio(float etiqueta, float longitud)
+{
+    return longitud < etiqueta;
+}
+
+float calcular_longitud(struct masa* masa, float coordx, float coordy){
+    float x = masa_obtener_coordx(masa);
+    float y = masa_obtener_coordy(masa);
+    return norma_puntos(x, y, coordx, coordy);
+
+}
+
+bool malla_masa_es_fija(masa_t*masa){
+    return es_fija(masa);
+}
 

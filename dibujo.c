@@ -8,6 +8,7 @@
 
 void dibujar_masa(masa_t *masa, SDL_Renderer *renderer) {
     SDL_Rect r1 = {((masa_obtener_coordx(masa)) - (masa_obtener_tam(masa)) / 2)*FACTOR_ESCALA, ((masa_obtener_coordy(masa)) - (masa_obtener_tam(masa)) / 2)*FACTOR_ESCALA, (masa_obtener_tam(masa))*FACTOR_ESCALA, (masa_obtener_tam(masa))*FACTOR_ESCALA};
+    SDL_SetRenderDrawColor(renderer, 0XE4, 0x08, 0XDB, 0X00);
     SDL_RenderDrawRect(renderer, &r1);
 }
 
@@ -24,7 +25,7 @@ void dibujar_resorte(resorte_t* resorte, SDL_Renderer* renderer) {
     float x2 = masa_obtener_coordx(masa_final);
     float y2 = masa_obtener_coordy(masa_final);
 
-    SDL_SetRenderDrawColor(renderer, 0xc7, 0x00, 0x39, 0xFF);
+    SDL_SetRenderDrawColor(renderer, 0x5A, 0xD6, 0x36, 0x00);
     SDL_RenderDrawLine(renderer, (int)(x1*FACTOR_ESCALA), (int)(y1*FACTOR_ESCALA), (int)(x2*FACTOR_ESCALA), (int)(y2*FACTOR_ESCALA));
 }
 
@@ -61,7 +62,6 @@ void moviendo_radio_resorte(const masa_t *masa, float x, float y, SDL_Renderer *
     float x1 = masa_obtener_coordx(masa);
     float y1 = masa_obtener_coordy(masa);
 
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
-
+    SDL_SetRenderDrawColor(renderer, 0xE4, 0x08, 0xDB, 0x00);
     SDL_RenderDrawLine(renderer, (int)(x1*FACTOR_ESCALA), (int)(y1*FACTOR_ESCALA), (int)(x*FACTOR_ESCALA), (int)(y*FACTOR_ESCALA));
 }

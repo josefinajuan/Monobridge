@@ -8,6 +8,7 @@ struct datos_masa
 {
     float x;
     float y;
+    bool es_fija;
 };
 
 struct datos_resorte
@@ -60,6 +61,7 @@ float calcular_nueva_coordenada_x(instante_t* uno_anterior, instante_t* dos_ante
     float xk_uno_anterior = 0;
     float xj_dos_anteriores = 0;
     float k_resorte;
+    float pos_x;
 
     for (size_t i = 0; i < uno_anterior->cant_masas; i++) {
         if (i == id_masa) {
@@ -91,7 +93,7 @@ float calcular_nueva_coordenada_x(instante_t* uno_anterior, instante_t* dos_ante
     }
     float bj = calcular_bx(m, xj_uno_anterior, xj_dos_anteriores, sumatoria_x);
     float aj = calcular_aj(m);
-    float pos_x = bj / aj;
+    pos_x = bj / aj;
     
     return pos_x;
 }
@@ -102,6 +104,7 @@ float calcular_nueva_coordenada_y(instante_t* uno_anterior, instante_t* dos_ante
     float yk_uno_anterior = 0;
     float yj_dos_anteriores = 0;
     float k_resorte;
+    float pos_y;
 
     for (size_t i = 0; i < uno_anterior->cant_masas; i++) {
         if (i == id_masa) {
@@ -110,7 +113,6 @@ float calcular_nueva_coordenada_y(instante_t* uno_anterior, instante_t* dos_ante
             break; // Salir del bucle una vez que se encuentra 
         }
     }
-
 
     for (size_t i = 0; i < uno_anterior->cant_resortes; i++) {
         if (uno_anterior->datos_resortes[i].id_masa1 == id_masa) {
@@ -134,7 +136,7 @@ float calcular_nueva_coordenada_y(instante_t* uno_anterior, instante_t* dos_ante
     }
     float bj = calcular_by(m, yj_uno_anterior, yj_dos_anteriores, sumatoria_y);
     float aj = calcular_aj(m);
-    float pos_y = bj / aj;
+    pos_y = bj / aj;
 
     return pos_y;
 }
@@ -162,8 +164,15 @@ instante_t* calcular_instante_nuevo(instante_t* uno_anterior, instante_t* dos_an
     float m = MASA_TOTAL / (uno_anterior->cant_masas);
     
     for (size_t i = 0; i < nuevo_instante->cant_masas; i++) {
-        nuevo_instante->datos_masas[i].x = calcular_nueva_coordenada_x(uno_anterior, dos_anteriores, simulacion, i, m);
-        nuevo_instante->datos_masas[i].y = calcular_nueva_coordenada_y(uno_anterior, dos_anteriores, simulacion, i, m);
+        if(uno_anterior->datos_masas[i].es_fija){
+            nuevo_instante->datos_masas[i].x = uno_anterior->datos_masas[i].x;
+            nuevo_instante->datos_masas[i].y = uno_anterior->datos_masas[i].y;
+    
+        } else{
+            nuevo_instante->datos_masas[i].x = calcular_nueva_coordenada_x(uno_anterior, dos_anteriores, simulacion, i, m);
+            nuevo_instante->datos_masas[i].y = calcular_nueva_coordenada_y(uno_anterior, dos_anteriores, simulacion, i, m);
+        }
+        
     }
     
     for (size_t i = 0; i < nuevo_instante->cant_resortes; i++) {
@@ -214,6 +223,7 @@ struct instante* copiar_instante(const struct instante* original) {
     for (size_t i = 0; i < copia->cant_masas; i++) {
         copia->datos_masas[i].x = original->datos_masas[i].x;
         copia->datos_masas[i].y = original->datos_masas[i].y;
+        copia->datos_masas[i].es_fija = original->datos_masas[i].es_fija;
     }
 
     for (size_t i = 0; i < copia->cant_resortes; i++) {
@@ -298,6 +308,7 @@ struct instante* crear_instante_desde_malla(malla_t* malla) {
     for (size_t i = 0; i < num_masas; i++) {
         nuevo_instante->datos_masas[i].x = malla_masa_obtener_coordx(malla_obtener_masa_por_id(malla, i));
         nuevo_instante->datos_masas[i].y = malla_masa_obtener_coordy(malla_obtener_masa_por_id(malla, i));
+        nuevo_instante->datos_masas[i].es_fija = es_fija(malla_obtener_masa_por_id(malla, i));
     }
 
     // Obtener la cantidad de resortes en la malla
@@ -435,7 +446,9 @@ struct instante* simulacion_instante_dos_anteriores(simulacion_t* simulacion) {
 }
 
 void dibujar_masa_simulacion(const struct datos_masa* masa, SDL_Renderer* renderer) {
-    SDL_Rect r1 = { (masa->x - TAM_MASA / 2) * FACTOR_ESCALA, (masa->y - TAM_MASA / 2) * FACTOR_ESCALA, TAM_MASA * FACTOR_ESCALA, TAM_MASA * FACTOR_ESCALA };
+    SDL_Rect r1 = { (masa->x - (TAM_MASA/FACTOR_ESCALA) / 2) * FACTOR_ESCALA, (masa->y - (TAM_MASA/FACTOR_ESCALA) / 2) * FACTOR_ESCALA, TAM_MASA, TAM_MASA };
+
+    SDL_SetRenderDrawColor(renderer, 0XFF, 0X00, 0X00, 0X00); // Color rojo para masas fijas
     SDL_RenderDrawRect(renderer, &r1);
 }
 
@@ -452,7 +465,7 @@ void dibujar_resorte_simulacion(const struct datos_resorte *resorte, SDL_Rendere
     float x2 = (masas[id_masa2].x);
     float y2 = (masas[id_masa2].y);
 
-    SDL_SetRenderDrawColor(renderer, 0xDA, 0xF7, 0xA6, 0xFF);
+    SDL_SetRenderDrawColor(renderer, 0x00, 0xD3, 0xFF, 0x00);
     SDL_RenderDrawLine(renderer, (int)(x1*FACTOR_ESCALA), (int)(y1*FACTOR_ESCALA), (int)(x2*FACTOR_ESCALA), (int)(y2*FACTOR_ESCALA));
 }
 
@@ -476,3 +489,16 @@ void simular(struct simulacion *simulacion, SDL_Renderer *renderer) {
     dibujar_instante_simulacion(simulacion_instante_uno_anterior(simulacion), renderer);
 }
 
+bool cumplen_estiramiento(simulacion_t* simulacion, float porcentaje_maximo) {
+
+    instante_t* uno_anterior = simulacion_instante_uno_anterior(simulacion);
+    size_t num_resortes = uno_anterior->cant_resortes;
+
+    for(size_t i = 0; i < num_resortes; i++) {
+        float l0 = uno_anterior->datos_resortes[i].l_inicial;
+        float l = uno_anterior->datos_resortes[i].l_nueva;
+        float porcentaje_estiramiento = (l - l0) / l0;
+        if (porcentaje_estiramiento > porcentaje_maximo) return false;
+    }
+    return true;
+}

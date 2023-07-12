@@ -20,7 +20,7 @@ size_t masa_obtener_id(const masa_t *masa);
 
 float masa_obtener_tam(const masa_t *masa);
 
-bool coincidir_masas(const masa_t *masa, float coordx, float coordy);
+float masa_obtener_masa(const masa_t *masa);
 
 void masa_actualizar_ids_masa(lista_iter_t *iter, lista_t *lista_masas);
 
@@ -38,5 +38,5 @@ float norma(const masa_t* masa_final, const masa_t* masa_inicial);
 
 bool es_fija(const masa_t * masa);
 
-
+void insertar_masa_masa(masa_t* masa, float masa_);
 #endif

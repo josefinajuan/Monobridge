@@ -16,9 +16,7 @@ masa_t *resorte_obtener_m1(const resorte_t *resorte);
 
 masa_t *resorte_obtener_m2(const resorte_t *resorte);
 
-void resorte_actualizar_l(resorte_t *resorte, float l_inicial);
-
-bool en_radio(float etiqueta, float longitud);
+void resorte_actualizar_l(resorte_t *resorte, float l);
 
 resorte_t* resorte_crear(size_t id,masa_t* masa_inicial,masa_t* masa_final);
 

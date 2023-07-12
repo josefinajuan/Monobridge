@@ -67,4 +67,6 @@ void dibujar_instante_simulacion(const struct instante *instante, SDL_Renderer *
 
 void simular(struct simulacion *simulacion, SDL_Renderer *renderer);
 
+bool cumplen_estiramiento(simulacion_t* simulacion, float porcentaje_maximo);
+
 #endif

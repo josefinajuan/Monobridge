@@ -31,11 +31,11 @@ bool malla_eliminar_masa_por_coordenadas(malla_t *malla, float coordx, float coo
 
 void malla_eliminar_resorte_por_coordenadas(malla_t* malla, float x, float y);
 
-bool malla_agregar_masa(malla_t *malla, masa_t *masa);
+masa_t* malla_masa_nueva(malla_t* malla, size_t id_masa, float coordx, float coordy, float tam);
 
-bool malla_agregar_resorte(malla_t* malla, resorte_t* resorte);
+masa_t* malla_masa_nueva_fija(malla_t* malla, size_t id_masa, float coordx, float coordy, float tam);
 
-void malla_actualizar_coord(masa_t *masa, float coordx, float coordy);
+resorte_t* malla_resorte_nuevo(malla_t* malla, size_t id_resorte, struct masa* masa1, struct masa* masa2) ;
 
 void malla_resorte_actualizar_l0(resorte_t* resorte, float l_inicial);
 
@@ -51,10 +51,6 @@ lista_t* malla_obtener_lista_masas(malla_t* malla);
 
 lista_t* malla_obtener_lista_resortes( malla_t* malla);
 
-float* obtener_l0_resortes(malla_t* malla);
-
-void liberar_vector(float* vector);
-
 masa_t* malla_obtener_masa_por_id(malla_t* malla, size_t indice);
 
 resorte_t* malla_obtener_resorte_por_id(malla_t* malla, size_t indice);
@@ -69,6 +65,8 @@ float malla_masa_obtener_coordx(masa_t* masa);
 
 float malla_masa_obtener_coordy(masa_t* masa);
 
+float malla_masa_obtener_tam(masa_t* masa);
+
 void copiar_malla(malla_t* malla_origen, malla_t* malla_destino);
 
 size_t malla_resorte_obtener_id_m1(const resorte_t* resorte);
@@ -77,6 +75,21 @@ size_t malla_resorte_obtener_id_m2(const resorte_t* resorte);
 
 size_t malla_obtener_id_masa(const masa_t* masa);
 
+size_t malla_resorte_obtener_id(const resorte_t* resorte);
+
+float malla_resorte_obtener_lo(const resorte_t* resorte);
+
 void reacomodar_id(struct malla *malla);
+
+bool coincidir_masas(const masa_t *masa, float coordx, float coordy);
+
+bool en_radio(float etiqueta, float longitud);
+
+float calcular_longitud(struct masa* masa, float coordx, float coordy);
+
+bool malla_masa_es_fija(masa_t*masa);
+
+float malla_masa_obtener_masa(masa_t* masa);
+
 
 #endif

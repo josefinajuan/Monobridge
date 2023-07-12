@@ -69,6 +69,10 @@ float masa_obtener_tam(const masa_t *masa)
     return masa->tam;
 }
 
+float masa_obtener_masa(const masa_t *masa){
+    return masa->masa;
+}
+
 void masa_actualizar_ids_masa(lista_iter_t *iter, lista_t *lista_masas)
 {
     size_t id_actual = 0;
@@ -83,12 +87,6 @@ void masa_actualizar_ids_masa(lista_iter_t *iter, lista_t *lista_masas)
 void masa_borrar(masa_t *masa)
 {
     free(masa);
-}
-
-bool coincidir_masas(const masa_t *masa, float coordx, float coordy)
-{
-    return (coordx >= (masa->coordx - MARGEN_ERROR) && coordx <= (masa->coordx + MARGEN_ERROR) &&
-            coordy >= (masa->coordy - MARGEN_ERROR) && coordy <= (masa->coordy + MARGEN_ERROR));
 }
 
 bool eliminar_masa_de_lista(masa_t *masa, lista_t *lista_masas)
@@ -145,3 +143,8 @@ bool es_fija(const masa_t *masa)
 {
     return masa->es_fija;
 }
+
+void insertar_masa_masa(masa_t* masa, float masa_) {
+    masa->masa = masa_;
+}
+

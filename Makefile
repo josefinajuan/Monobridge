@@ -1,8 +1,8 @@
 CFLAGS = -Wall -pedantic -std=c99 -c -g -DTTF
 LFLAGS = -lSDL2 -lSDL2_ttf -lm
 
-programa: lista.o masas.o resortes.o malla.o dibujo.o simulacion.o main.o 
-	gcc lista.o masas.o resortes.o malla.o dibujo.o simulacion.o main.o -o programa $(LFLAGS)
+programa: lista.o masas.o resortes.o malla.o dibujo.o simulacion.o juego.o main.o 
+	gcc lista.o masas.o resortes.o malla.o dibujo.o simulacion.o juego.o main.o -o programa $(LFLAGS)
 
 lista.o: lista.c lista.h
 	gcc $(CFLAGS) lista.c
@@ -22,7 +22,10 @@ dibujo.o: dibujo.c dibujo.h
 simulacion.o: simulacion.c simulacion.h
 	gcc $(CFLAGS) simulacion.c 
 
-main.o: main.c config.h dibujo.h lista.h resortes.h masas.h malla.h simulacion.h
+juego.o: juego.c juego.h
+	gcc $(CFLAGS) juego.c 
+
+main.o: main.c config.h dibujo.h lista.h resortes.h masas.h malla.h simulacion.h juego.h
 	gcc $(CFLAGS) main.c
 
 clean:
