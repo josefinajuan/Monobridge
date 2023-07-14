@@ -47,6 +47,8 @@ masa_t *obtener_masa(const malla_t *malla, float coordx, float coordy);
 
 bool son_iguales(int x1, int y1, int x2, int y2);
 
+void malla_actualizar_coord(masa_t* masa, float coordx, float coordy);
+
 lista_t* malla_obtener_lista_masas(malla_t* malla);
 
 lista_t* malla_obtener_lista_resortes( malla_t* malla);
@@ -66,6 +68,8 @@ float malla_masa_obtener_coordx(masa_t* masa);
 float malla_masa_obtener_coordy(masa_t* masa);
 
 float malla_masa_obtener_tam(masa_t* masa);
+
+float malla_masa_obtener_masa(masa_t* masa);
 
 void copiar_malla(malla_t* malla_origen, malla_t* malla_destino);
 
@@ -88,8 +92,5 @@ bool en_radio(float etiqueta, float longitud);
 float calcular_longitud(struct masa* masa, float coordx, float coordy);
 
 bool malla_masa_es_fija(masa_t*masa);
-
-float malla_masa_obtener_masa(masa_t* masa);
-
 
 #endif

@@ -8,13 +8,13 @@ void inicializar_nivel(malla_t *malla, int nivel) {
         return;
     }
     // Calcular la distancia horizontal entre las masas fijas
-    float distancia_horizontal = 4.0 + nivel - 1;
+    float distancia_horizontal = (VENTANA_ANCHO/FACTOR_ESCALA)/12 + nivel -1;
 
     // Calcular las coordenadas de las masas fijas
-    float coordx1 = distancia_horizontal / 2.0;
-    float coordy1 = 0.5;
-    float coordx2 = coordx1 + distancia_horizontal;
-    float coordy2 = 0.5;
+    float coordx1 = ((VENTANA_ANCHO/ FACTOR_ESCALA) / 2) - distancia_horizontal;
+    float coordy1 = 9.0;
+    float coordx2 = ((VENTANA_ANCHO/ FACTOR_ESCALA) / 2) + distancia_horizontal;
+    float coordy2 = 9.0;
 
     size_t id_masa1 = 0;
     size_t id_masa2 = 1;
