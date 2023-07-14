@@ -1,8 +1,8 @@
 CFLAGS = -Wall -pedantic -std=c99 -c -g -DTTF
 LFLAGS = -lSDL2 -lSDL2_ttf -lm
 
-programa: lista.o masas.o resortes.o malla.o dibujo.o simulacion.o juego.o main.o 
-	gcc lista.o masas.o resortes.o malla.o dibujo.o simulacion.o juego.o main.o -o programa $(LFLAGS)
+monobridge: lista.o masas.o resortes.o malla.o dibujo.o simulacion.o juego.o main.o 
+	gcc lista.o masas.o resortes.o malla.o dibujo.o simulacion.o juego.o main.o -o monobridge $(LFLAGS)
 
 lista.o: lista.c lista.h
 	gcc $(CFLAGS) lista.c
