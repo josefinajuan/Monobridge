@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        if (!abrir_nivel(f_entrada, malla_simulacion))
+        if (!nivel_abrir(f_entrada, malla_simulacion))
         {
             fclose(f_entrada);
             malla_destruir(malla_simulacion);
@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
             if (construyendo)
             {
                 malla_construccion = malla_crear();
-                inicializar_nivel(malla_construccion, nivel);
+                nivel_inicio(malla_construccion, nivel);
                 construyendo = false;
             }
 
@@ -342,7 +342,7 @@ int main(int argc, char *argv[])
                     return 1;
                 }
                   
-                if (!guardar_nivel(f_salida, malla_construccion))
+                if (!nivel_guardar(f_salida, malla_construccion))
                 {
                     fclose(f_salida);
                     destruir_simulacion(simulacion);
@@ -351,7 +351,7 @@ int main(int argc, char *argv[])
                     return 1;
                 }
                 
-                puntos += cantidad_de_puntos(malla_construccion, nivel);
+                puntos += puntos_ganar(malla_construccion, nivel);
                 malla_destruir(malla_construccion);
                 
                 if (fclose(f_salida) == EOF){

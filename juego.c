@@ -3,7 +3,7 @@
 #include "lista.h"
 #include "config.h"
 
-void inicializar_nivel(malla_t *malla, int nivel) {
+void nivel_inicio(malla_t *malla, int nivel) {
      if (malla == NULL || nivel < 1) {
         return;
     }
@@ -24,7 +24,7 @@ void inicializar_nivel(malla_t *malla, int nivel) {
     malla_masa_nueva_fija(malla,id_masa2,coordx2,coordy2, TAM_MASA/FACTOR_ESCALA);
 }
 
-bool leer_numero_de_datos(FILE *f, size_t *datos) {
+bool leer_n_datos(FILE *f, size_t *datos) {
     if (f == NULL || datos == NULL) {
         return false;
     }
@@ -91,7 +91,7 @@ bool leer_resorte(FILE *f, size_t *id, size_t *id_masa_1, size_t *id_masa_2, flo
     return true;
 }
 
-bool escribir_numero_de_datos(FILE *f, size_t datos) {
+bool escribir_n_datos(FILE *f, size_t datos) {
      if (f == NULL) {
         return false;
     }
@@ -159,7 +159,7 @@ bool escribir_resorte(FILE *f, size_t id, size_t id_masa_1, size_t id_masa_2, fl
     return true;
 }
 
-bool guardar_nivel(FILE *f, malla_t *malla) {
+bool nivel_guardar(FILE *f, malla_t *malla) {
     if (f == NULL || malla == NULL) {
         return false;
     }
@@ -169,7 +169,7 @@ bool guardar_nivel(FILE *f, malla_t *malla) {
     size_t num_resortes = malla_cantidad_resortes(malla);
 
     // Escribir el número de masas y resortes en el archivo
-    if (!escribir_numero_de_datos(f, num_masas) || !escribir_numero_de_datos(f, num_resortes)) {
+    if (!escribir_n_datos(f, num_masas) || !escribir_n_datos(f, num_resortes)) {
         return false;
     }
 
@@ -226,14 +226,14 @@ bool guardar_nivel(FILE *f, malla_t *malla) {
     return true;
 }
 
-bool abrir_nivel(FILE *f, malla_t *malla) {
+bool nivel_abrir(FILE *f, malla_t *malla) {
     if (f == NULL || malla == NULL) {
         return false;
     }
 
     // Leer el número de masas y resortes del archivo
     size_t num_masas, num_resortes;
-    if (!leer_numero_de_datos(f, &num_masas) || !leer_numero_de_datos(f, &num_resortes)) {
+    if (!leer_n_datos(f, &num_masas) || !leer_n_datos(f, &num_resortes)) {
         return false;
     }
 
@@ -272,6 +272,6 @@ bool abrir_nivel(FILE *f, malla_t *malla) {
     return true;
 }
 
-int cantidad_de_puntos(malla_t *malla, int nivel) {
+int puntos_ganar(malla_t *malla, int nivel) {
     return malla_cantidad_resortes(malla);
 }
