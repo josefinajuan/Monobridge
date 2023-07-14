@@ -7,6 +7,9 @@
 #include <SDL2/SDL.h>
 
 void dibujar_masa(masa_t *masa, SDL_Renderer *renderer) {
+    if (masa == NULL || renderer == NULL) {
+        return;
+    }
     SDL_Rect r1 = {((masa_obtener_coordx(masa)) - (masa_obtener_tam(masa)) / 2)*FACTOR_ESCALA, ((masa_obtener_coordy(masa)) - (masa_obtener_tam(masa)) / 2)*FACTOR_ESCALA, (masa_obtener_tam(masa))*FACTOR_ESCALA, (masa_obtener_tam(masa))*FACTOR_ESCALA};
     SDL_SetRenderDrawColor(renderer, 0XE4, 0x08, 0XDB, 0X00);
     SDL_RenderDrawRect(renderer, &r1);
@@ -30,6 +33,9 @@ void dibujar_resorte(resorte_t* resorte, SDL_Renderer* renderer) {
 }
 
 void dibujar_lista_masas(malla_t *malla, SDL_Renderer *renderer) {
+      if (malla == NULL || renderer == NULL) {
+        return;
+    }
     lista_iter_t *l_iter = lista_iter_crear(malla_obtener_lista_masas(malla));
     while (!lista_iter_al_final(l_iter)) {
         masa_t *masa = lista_iter_ver_actual(l_iter);
@@ -40,6 +46,9 @@ void dibujar_lista_masas(malla_t *malla, SDL_Renderer *renderer) {
 }
 
 void dibujar_lista_resortes(malla_t *malla, SDL_Renderer *renderer) {
+    if (malla == NULL || renderer == NULL) {
+        return;
+    }
     lista_iter_t *l_iter = lista_iter_crear(malla_obtener_lista_resortes(malla));
     while (!lista_iter_al_final(l_iter)) {
         resorte_t* resorte = lista_iter_ver_actual(l_iter);
@@ -50,6 +59,9 @@ void dibujar_lista_resortes(malla_t *malla, SDL_Renderer *renderer) {
 }
 
 void mostrar_malla(malla_t *malla, SDL_Renderer *renderer) {
+    if (malla == NULL || renderer == NULL) {
+        return;
+    }
     dibujar_lista_masas(malla, renderer);
     dibujar_lista_resortes(malla, renderer);
 }

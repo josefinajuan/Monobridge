@@ -33,26 +33,22 @@ struct simulacion
     lista_t *instantes;
 };
 
-float calcular_l_actual(float x1, float y1, float x2, float y2)
-{
+float calcular_l_actual(float x1, float y1, float x2, float y2){
     float distancia = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
     return distancia;
 }
 
-float calcular_by(float m, float y_uno_anterior, float y_dos_anteriores, float sumatoria)
-{
+float calcular_by(float m, float y_uno_anterior, float y_dos_anteriores, float sumatoria){
     float bj = (m / (DT * DT)) * ((2 * y_uno_anterior) - y_dos_anteriores) + (B / DT) * y_uno_anterior + m * G + sumatoria;
     return bj;
 }
 
-float calcular_bx(float m, float x_uno_anterior, float x_dos_anteriores, float sumatoria)
-{
+float calcular_bx(float m, float x_uno_anterior, float x_dos_anteriores, float sumatoria){
     float bj = (m / (DT * DT)) * ((2 * x_uno_anterior) - x_dos_anteriores) + (B / DT) * x_uno_anterior + sumatoria;
     return bj;
 }
 
-float calcular_aj(float m)
-{
+float calcular_aj(float m){
     float aj = m / (DT * DT) + (B / DT);
     return aj;
 }
@@ -169,8 +165,8 @@ instante_t *calcular_instante_nuevo(instante_t *uno_anterior, instante_t *dos_an
     nuevo_instante->cant_resortes = uno_anterior->cant_resortes;
 
     nuevo_instante->datos_masas = malloc(nuevo_instante->cant_masas * sizeof(datos_masa_t));
-    if (nuevo_instante->datos_masas == NULL)
-    {
+    if (nuevo_instante->datos_masas == NULL){
+        free(nuevo_instante->datos_masas);
         free(nuevo_instante);
         return NULL;
     }
@@ -293,8 +289,7 @@ simulacion_t *simulacion_crear(struct instante *uno_anterior, struct instante *d
     return simulacion;
 }
 
-void destruir_instante(struct instante *instante)
-{
+void destruir_instante(struct instante *instante){
     if (instante == NULL)
     {
         return;
@@ -304,16 +299,13 @@ void destruir_instante(struct instante *instante)
     free(instante);
 }
 
-void destruir_simulacion(simulacion_t *simulacion)
-{
-    if (simulacion == NULL)
-    {
+void destruir_simulacion(simulacion_t *simulacion){
+    if (simulacion == NULL){
         return;
     }
 
     lista_iter_t *iter = lista_iter_crear(simulacion->instantes);
-    if (iter == NULL)
-    {
+    if (iter == NULL){
         return;
     }
 
@@ -342,15 +334,13 @@ struct instante *crear_instante_desde_malla(malla_t *malla)
 
     // Asignar memoria para los datos de masas
     nuevo_instante->datos_masas = (struct datos_masa *)malloc(sizeof(struct datos_masa) * num_masas);
-    if (nuevo_instante->datos_masas == NULL)
-    {
+    if (nuevo_instante->datos_masas == NULL){
         free(nuevo_instante);
         return NULL;
     }
 
     // Asignar los datos de las masas
-    for (size_t i = 0; i < num_masas; i++)
-    {
+    for (size_t i = 0; i < num_masas; i++){
         nuevo_instante->datos_masas[i].x = malla_masa_obtener_coordx(malla_obtener_masa_por_id(malla, i));
         nuevo_instante->datos_masas[i].y = malla_masa_obtener_coordy(malla_obtener_masa_por_id(malla, i));
         nuevo_instante->datos_masas[i].es_fija = es_fija(malla_obtener_masa_por_id(malla, i));
@@ -383,8 +373,7 @@ struct instante *crear_instante_desde_malla(malla_t *malla)
     return nuevo_instante;
 }
 
-simulacion_t *simulacion_inicio(malla_t *malla)
-{
+simulacion_t *simulacion_inicio(malla_t *malla){
     simulacion_t *simulacion = _simulacion_crear();
     if (simulacion == NULL)
     {
@@ -411,8 +400,7 @@ simulacion_t *simulacion_inicio(malla_t *malla)
     return simulacion;
 }
 
-void simulacion_a_malla(malla_t *malla_simulacion, simulacion_t *simulacion)
-{
+void simulacion_a_malla(malla_t *malla_simulacion, simulacion_t *simulacion){
     // Obtener el instante uno_anterior de la simulación
     instante_t *uno_anterior = simulacion_instante_uno_anterior(simulacion);
     if (uno_anterior == NULL)
@@ -460,16 +448,14 @@ void simulacion_a_malla(malla_t *malla_simulacion, simulacion_t *simulacion)
     }
 }
 
-void simulacion_agregar(simulacion_t *simulacion, malla_t *malla_simulacion)
-{
+void simulacion_agregar(simulacion_t *simulacion){
     struct instante *nuevo_instante = calcular_instante_nuevo(simulacion_instante_uno_anterior(simulacion), simulacion_instante_dos_anteriores(simulacion), simulacion);
     lista_insertar_ultimo(simulacion->instantes, nuevo_instante);
     struct instante *dos_anteriores = lista_borrar_primero(simulacion->instantes);
     destruir_instante(dos_anteriores);
 }
 
-struct instante *simulacion_instante_uno_anterior(simulacion_t *simulacion)
-{
+struct instante *simulacion_instante_uno_anterior(simulacion_t *simulacion){
     if (simulacion == NULL || lista_esta_vacia(simulacion->instantes))
     {
         return NULL;
@@ -492,8 +478,7 @@ struct instante *simulacion_instante_uno_anterior(simulacion_t *simulacion)
     return uno_anterior;
 }
 
-struct instante *simulacion_instante_dos_anteriores(simulacion_t *simulacion)
-{
+struct instante *simulacion_instante_dos_anteriores(simulacion_t *simulacion){
     if (simulacion == NULL || lista_largo(simulacion->instantes) < 2)
     {
         return NULL;
@@ -511,16 +496,14 @@ struct instante *simulacion_instante_dos_anteriores(simulacion_t *simulacion)
     return dos_anteriores;
 }
 
-void dibujar_masa_simulacion(const struct datos_masa *masa, SDL_Renderer *renderer)
-{
+void dibujar_masa_simulacion(const struct datos_masa *masa, SDL_Renderer *renderer){
     SDL_Rect r1 = {(masa->x - (TAM_MASA / FACTOR_ESCALA) / 2) * FACTOR_ESCALA, (masa->y - (TAM_MASA / FACTOR_ESCALA) / 2) * FACTOR_ESCALA, TAM_MASA, TAM_MASA};
 
     SDL_SetRenderDrawColor(renderer, 0XFF, 0X00, 0X00, 0X00); // Color rojo para masas fijas
     SDL_RenderDrawRect(renderer, &r1);
 }
 
-void dibujar_resorte_simulacion(const struct datos_resorte *resorte, SDL_Renderer *renderer, const struct datos_masa *masas)
-{
+void dibujar_resorte_simulacion(const struct datos_resorte *resorte, SDL_Renderer *renderer, const struct datos_masa *masas){
     if (resorte == NULL || renderer == NULL)
     {
         return;
@@ -538,8 +521,7 @@ void dibujar_resorte_simulacion(const struct datos_resorte *resorte, SDL_Rendere
     SDL_RenderDrawLine(renderer, (int)(x1 * FACTOR_ESCALA), (int)(y1 * FACTOR_ESCALA), (int)(x2 * FACTOR_ESCALA), (int)(y2 * FACTOR_ESCALA));
 }
 
-void dibujar_instante_simulacion(const struct instante *instante, SDL_Renderer *renderer)
-{
+void dibujar_instante_simulacion(const struct instante *instante, SDL_Renderer *renderer){
     struct datos_masa *masas = instante->datos_masas;
     struct datos_resorte *resortes = instante->datos_resortes;
 
@@ -557,23 +539,33 @@ void dibujar_instante_simulacion(const struct instante *instante, SDL_Renderer *
     }
 }
 
-void simular(struct simulacion *simulacion, SDL_Renderer *renderer)
-{
-    dibujar_instante_simulacion(simulacion_instante_uno_anterior(simulacion), renderer);
+void simular(struct simulacion *simulacion, SDL_Renderer *renderer){
+    
+    struct instante *uno_anterior = simulacion_instante_uno_anterior(simulacion);
+
+    if (uno_anterior == NULL)
+    {
+        return;
+    }
+    dibujar_instante_simulacion(uno_anterior, renderer);
 }
 
-bool cumplen_estiramiento(simulacion_t *simulacion, float porcentaje_maximo)
-{
+bool cumplen_estiramiento(simulacion_t *simulacion, float porcentaje_maximo){
     instante_t *uno_anterior = simulacion_instante_uno_anterior(simulacion);
+    if (uno_anterior == NULL)
+    {
+        return false;
+    }
+
     size_t num_resortes = uno_anterior->cant_resortes;
 
-    for (size_t i = 0; i < num_resortes; i++)
-    {
+    for (size_t i = 0; i < num_resortes; i++){
         float l0 = uno_anterior->datos_resortes[i].l_inicial;
         float l = uno_anterior->datos_resortes[i].l_nueva;
-        float porcentaje_estiramiento = (l - l0) / l0;
-        if (porcentaje_estiramiento > porcentaje_maximo)
+        float porcentaje_estiramiento = ((l - l0) / l0);
+        if (porcentaje_estiramiento > porcentaje_maximo){
             return false;
+        }
     }
     return true;
 }

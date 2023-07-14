@@ -14,7 +14,7 @@
 #define L0_MAX 150                   // Máxima longitud de un resorte
 #define FACTOR_ESCALA 50.0            // Conversión entre coordenadas de pantalla y mundo
 
-#define MAXIMO_ESTIRAMIENTO 0.13    // Porcentaje de estiramiento de un resorte para perder
+#define MAXIMO_ESTIRAMIENTO 0.5    // Porcentaje de estiramiento de un resorte para perder
 #define MASA_TOTAL 10.0             // Suma de todas las masas de la malla
 #define K_BASE 200                  // k_resorte = K_BASE / pow(l0, POTENCIA_K)
 #define POTENCIA_K 1.5

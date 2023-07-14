@@ -14,15 +14,13 @@ struct malla{
     lista_t* lista_masas;
 };
 
-float distancia_puntos(float x1, float y1, float x2, float y2)
-{
+float distancia_puntos(float x1, float y1, float x2, float y2){
     float dx = x2 - x1;
     float dy = y2 - y1;
     return sqrt(dx * dx + dy * dy);
 }
 
-float distancia_punto_segmento(float xp, float yp, float xj, float yj, float xk, float yk)
-{
+float distancia_punto_segmento(float xp, float yp, float xj, float yj, float xk, float yk){
     // Calcular los componentes del vector (pk - pj)
     float dx = xk - xj;
     float dy = yk - yj;
@@ -58,8 +56,7 @@ float distancia_punto_segmento(float xp, float yp, float xj, float yj, float xk,
     }
 }
 
-malla_t *malla_crear()
-{
+malla_t *malla_crear(){
     malla_t *m = malloc(sizeof(malla_t));
     if (m == NULL)
         return NULL;
@@ -82,8 +79,7 @@ malla_t *malla_crear()
     return m;
 }
 
-void malla_destruir(malla_t *m)
-{
+void malla_destruir(malla_t *m){
     if (m == NULL)
         return;
 
@@ -93,18 +89,15 @@ void malla_destruir(malla_t *m)
     free(m);
 }
 
-size_t malla_cantidad_masas(const malla_t *malla)
-{
+size_t malla_cantidad_masas(const malla_t *malla){
     return lista_largo(malla->lista_masas);
 }
 
-size_t malla_cantidad_resortes(const malla_t *malla)
-{
+size_t malla_cantidad_resortes(const malla_t *malla){
     return lista_largo(malla->lista_resortes);
 }
 
-bool estoy_sobre_masa(float coordx, float coordy, const malla_t *malla)
-{
+bool estoy_sobre_masa(float coordx, float coordy, const malla_t *malla){
     lista_iter_t *iter = lista_iter_crear(malla->lista_masas);
     if (iter == NULL)
     {
@@ -131,8 +124,7 @@ bool estoy_sobre_masa(float coordx, float coordy, const malla_t *malla)
     return false;
 }
 
-bool estoy_sobre_resorte(float x, float y, const malla_t *malla)
-{
+bool estoy_sobre_resorte(float x, float y, const malla_t *malla){
     lista_iter_t *iter = lista_iter_crear(malla->lista_resortes);
     if (iter == NULL)
     {
@@ -165,8 +157,7 @@ bool estoy_sobre_resorte(float x, float y, const malla_t *malla)
     return false;
 }
 
-bool malla_eliminar_masa_por_coordenadas(malla_t *malla, float coordx, float coordy)
-{
+bool malla_eliminar_masa_por_coordenadas(malla_t *malla, float coordx, float coordy){
     lista_iter_t *iter = lista_iter_crear(malla->lista_masas);
     if (iter == NULL)
     {
@@ -338,8 +329,7 @@ masa_t *malla_masa_nueva_fija(malla_t *malla, size_t id_masa, float coordx, floa
     return masa_final;
 }
 
-resorte_t *malla_resorte_nuevo(malla_t *malla, size_t id_resorte, struct masa *masa1, struct masa *masa2)
-{
+resorte_t *malla_resorte_nuevo(malla_t *malla, size_t id_resorte, struct masa *masa1, struct masa *masa2){
     resorte_t *resorte = resorte_crear(id_resorte, masa1, masa2);
     if (resorte == NULL)
     {
@@ -361,8 +351,7 @@ void malla_resorte_actualizar_l0(resorte_t *resorte, float l_inicial)
     }
 }
 
-bool malla_masas_en_radio(malla_t *malla, masa_t *masa, float l0_max)
-{
+bool malla_masas_en_radio(malla_t *malla, masa_t *masa, float l0_max){
     lista_iter_t *iter = lista_iter_crear(malla->lista_resortes);
     if (iter == NULL)
     {
@@ -392,8 +381,7 @@ bool malla_masas_en_radio(malla_t *malla, masa_t *masa, float l0_max)
     return true; // Todos los resortes cumplen con el rango
 }
 
-bool malla_mover_masas(malla_t *malla, masa_t *masa, float coordx, float coordy, float l0_max)
-{
+bool malla_mover_masas(malla_t *malla, masa_t *masa, float coordx, float coordy, float l0_max){
     bool tiene_resortes = false;
 
     lista_iter_t *iter = lista_iter_crear(malla->lista_resortes);
@@ -446,8 +434,7 @@ bool malla_mover_masas(malla_t *malla, masa_t *masa, float coordx, float coordy,
     return true;
 }
 
-masa_t *obtener_masa(const malla_t *malla, float coordx, float coordy)
-{
+masa_t *obtener_masa(const malla_t *malla, float coordx, float coordy){
     if (malla == NULL)
         return NULL;
 
@@ -500,8 +487,7 @@ lista_t *malla_obtener_lista_resortes(malla_t *malla)
     return malla->lista_resortes;
 }
 
-masa_t *malla_obtener_masa_por_id(malla_t *malla, size_t id)
-{
+masa_t *malla_obtener_masa_por_id(malla_t *malla, size_t id){
     lista_iter_t *iter = lista_iter_crear(malla->lista_masas);
     if (iter == NULL)
     {
@@ -525,8 +511,7 @@ masa_t *malla_obtener_masa_por_id(malla_t *malla, size_t id)
     return masa;
 }
 
-resorte_t *malla_obtener_resorte_por_id(malla_t *malla, size_t id)
-{
+resorte_t *malla_obtener_resorte_por_id(malla_t *malla, size_t id){
     lista_iter_t *iter = lista_iter_crear(malla->lista_resortes);
     if (iter == NULL)
     {
@@ -550,8 +535,7 @@ resorte_t *malla_obtener_resorte_por_id(malla_t *malla, size_t id)
     return resorte;
 }
 
-masa_t *malla_id_resorte_masa1(malla_t *malla, size_t id)
-{
+masa_t *malla_id_resorte_masa1(malla_t *malla, size_t id){
     resorte_t *resorte = malla_obtener_resorte_por_id(malla, id);
     if (resorte == NULL)
     {
@@ -561,8 +545,7 @@ masa_t *malla_id_resorte_masa1(malla_t *malla, size_t id)
     return resorte_obtener_m1(resorte);
 }
 
-masa_t *malla_id_resorte_masa2(malla_t *malla, size_t id)
-{
+masa_t *malla_id_resorte_masa2(malla_t *malla, size_t id){
     resorte_t *resorte = malla_obtener_resorte_por_id(malla, id);
     if (resorte == NULL)
     {
@@ -572,8 +555,7 @@ masa_t *malla_id_resorte_masa2(malla_t *malla, size_t id)
     return resorte_obtener_m2(resorte);
 }
 
-float malla_resorte_longitud_actual(malla_t *malla, size_t id)
-{
+float malla_resorte_longitud_actual(malla_t *malla, size_t id){
     resorte_t *resorte = malla_obtener_resorte_por_id(malla, id);
     if (resorte == NULL)
     {
@@ -586,30 +568,46 @@ float malla_resorte_longitud_actual(malla_t *malla, size_t id)
     return sqrt(dx * dx + dy * dy);
 }
 
-float malla_masa_obtener_coordx(masa_t *masa)
-{
+float malla_masa_obtener_coordx(masa_t *masa){
     // Acceder a la coordenada x de la masa y retornar su valor
+    if (masa == NULL)
+    {
+        return 0.0;
+    }
+    
     return masa_obtener_coordx(masa);
 }
 
-float malla_masa_obtener_coordy(masa_t *masa)
-{
+float malla_masa_obtener_coordy(masa_t *masa){
     // Acceder a la coordenada y de la masa y retornar su valor
+    if (masa == NULL)
+    {
+        return 0.0;
+    }
+
     return masa_obtener_coordy(masa);
 }
 
-float malla_masa_obtener_tam(masa_t *masa)
-{
+float malla_masa_obtener_tam(masa_t *masa){
+    
+    if (masa == NULL)
+    {
+        return 0.0;
+    }
     return masa_obtener_tam(masa);
 }
 
-float malla_masa_obtener_masa(masa_t *masa)
-{
+float malla_masa_obtener_masa(masa_t *masa){
+    
+    if (masa == NULL)
+    {
+        return 0.0;
+    }
+
     return masa_obtener_masa(masa);
 }
 
-void copiar_malla(malla_t *malla_origen, malla_t *malla_destino)
-{
+void copiar_malla(malla_t *malla_origen, malla_t *malla_destino){
     // Verificar si la malla de origen y destino son válidas
     if (malla_origen == NULL || malla_destino == NULL)
     {
@@ -645,7 +643,12 @@ void copiar_malla(malla_t *malla_origen, malla_t *malla_destino)
     while (!lista_iter_al_final(iter_masas))
     {
         masa_t *masa_origen = lista_iter_ver_actual(iter_masas);
-        struct masa *masa_copia = masa_crear(masa_obtener_id(masa_origen), masa_obtener_coordx(masa_origen), masa_obtener_coordy(masa_origen), masa_obtener_tam(masa_origen));
+        struct masa *masa_copia;
+        if(es_fija(masa_origen)){
+            masa_copia = masa_crear_fija(masa_obtener_id(masa_origen), masa_obtener_coordx(masa_origen), masa_obtener_coordy(masa_origen), masa_obtener_tam(masa_origen));
+        } else {
+            masa_copia = masa_crear(masa_obtener_id(masa_origen), masa_obtener_coordx(masa_origen), masa_obtener_coordy(masa_origen), masa_obtener_tam(masa_origen));
+        }
         if (masa_copia != NULL)
         {
             lista_insertar_ultimo(lista_masas_destino, masa_copia);
@@ -657,8 +660,7 @@ void copiar_malla(malla_t *malla_origen, malla_t *malla_destino)
     lista_iter_destruir(iter_masas);
 }
 
-size_t malla_resorte_obtener_id_m1(const resorte_t *resorte)
-{
+size_t malla_resorte_obtener_id_m1(const resorte_t *resorte){
     if (resorte == NULL || resorte_obtener_m1(resorte) == NULL)
     {
         // Manejar el caso de resorte nulo o masa1 nula según corresponda
@@ -668,8 +670,7 @@ size_t malla_resorte_obtener_id_m1(const resorte_t *resorte)
     return masa_obtener_id(resorte_obtener_m1(resorte));
 }
 
-size_t malla_resorte_obtener_id_m2(const resorte_t *resorte)
-{
+size_t malla_resorte_obtener_id_m2(const resorte_t *resorte){
     if (resorte == NULL || resorte_obtener_m2(resorte) == NULL)
     {
         // Manejar el caso de resorte nulo o masa1 nula según corresponda
@@ -679,8 +680,7 @@ size_t malla_resorte_obtener_id_m2(const resorte_t *resorte)
     return masa_obtener_id(resorte_obtener_m2(resorte));
 }
 
-size_t malla_obtener_id_masa(const masa_t *masa)
-{
+size_t malla_obtener_id_masa(const masa_t *masa){
     // Verificar si el puntero de masa es válido
     if (masa == NULL)
     {
@@ -693,13 +693,20 @@ size_t malla_obtener_id_masa(const masa_t *masa)
     return id_masa;
 }
 
-size_t malla_resorte_obtener_id(const resorte_t *resorte)
-{
+size_t malla_resorte_obtener_id(const resorte_t *resorte){
+    
+    if (resorte == NULL)
+    {
+        return 0;
+    }
     return resorte_obtener_id(resorte);
 }
 
-float malla_resorte_obtener_lo(const resorte_t *resorte)
-{
+float malla_resorte_obtener_lo(const resorte_t *resorte){
+    if (resorte == NULL)
+    {
+        return 0.0;
+    }
     return resorte_obtener_lo(resorte);
 }
 
@@ -720,8 +727,11 @@ void reacomodar_id(struct malla *malla)
     lista_iter_destruir(iter_resortes);
 }
 
-bool coincidir_masas(const masa_t *masa, float coordx, float coordy)
-{
+bool coincidir_masas(const masa_t *masa, float coordx, float coordy){
+    if (masa == NULL)
+    {
+        return false;
+    }
     return (coordx >= (masa_obtener_coordx(masa) - MARGEN_ERROR) && coordx <= (masa_obtener_coordx(masa) + MARGEN_ERROR) &&
             coordy >= (masa_obtener_coordy(masa) - MARGEN_ERROR) && coordy <= (masa_obtener_coordy(masa) + MARGEN_ERROR));
 }
@@ -731,14 +741,21 @@ bool en_radio(float etiqueta, float longitud)
     return longitud < etiqueta;
 }
 
-float calcular_longitud(struct masa *masa, float coordx, float coordy)
-{
+float calcular_longitud(struct masa *masa, float coordx, float coordy){
+    if (masa == NULL)
+    {
+        return 0.0;
+    }
+    
     float x = masa_obtener_coordx(masa);
     float y = masa_obtener_coordy(masa);
     return norma_puntos(x, y, coordx, coordy);
 }
 
-bool malla_masa_es_fija(masa_t *masa)
-{
+bool malla_masa_es_fija(masa_t *masa){   
+    if (masa == NULL)
+    {
+        return false;
+    }
     return es_fija(masa);
 }

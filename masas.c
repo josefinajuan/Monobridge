@@ -51,25 +51,40 @@ struct masa* masa_crear_fija(size_t id, float x, float y, float tam){
 
 float masa_obtener_coordy(const masa_t *masa)
 {
+    if(masa == NULL){
+        return 0.0;
+    }
     return masa->coordy;
 }
 
 float masa_obtener_coordx(const masa_t *masa)
-{
+{   if(masa == NULL){
+        return 0.0;
+    }
     return masa->coordx;
 }
 
 size_t masa_obtener_id(const masa_t *masa)
 {
+    if(masa == NULL){
+        return 0.0;
+    }
     return masa->id;
 }
 
 float masa_obtener_tam(const masa_t *masa)
 {
+    if(masa == NULL){
+        return 0.0;
+    }
+    
     return masa->tam;
 }
 
 float masa_obtener_masa(const masa_t *masa){
+    if(masa == NULL){
+        return 0.0;
+    }
     return masa->masa;
 }
 
@@ -86,6 +101,9 @@ void masa_actualizar_ids_masa(lista_iter_t *iter, lista_t *lista_masas)
 
 void masa_borrar(masa_t *masa)
 {
+    if (masa == NULL){
+        return;
+    }
     free(masa);
 }
 
@@ -115,11 +133,17 @@ bool eliminar_masa_de_lista(masa_t *masa, lista_t *lista_masas)
 
 void masa_actualizar_coordx(masa_t *masa, float coordx)
 {
+    if (masa == NULL){
+        return;
+    }
     masa->coordx = coordx;
 }
 
 void masa_actualizar_coordy(masa_t *masa, float coordy)
 {
+    if (masa == NULL){
+        return;
+    }
     masa->coordy = coordy;
 }
 
@@ -132,6 +156,9 @@ float norma_puntos(float x1, float y1, float x2, float y2)
 
 float norma(const masa_t *masa_final, const masa_t *masa_inicial)
 {
+    if (masa_final == NULL || masa_inicial == NULL){
+        return 0.0;
+    }
     float x1 = masa_inicial->coordx;
     float x2 = masa_final->coordx;
     float y1 = masa_inicial->coordy;
@@ -141,10 +168,17 @@ float norma(const masa_t *masa_final, const masa_t *masa_inicial)
 
 bool es_fija(const masa_t *masa)
 {
+    if (masa == NULL){
+        return false;
+    }
     return masa->es_fija;
 }
 
 void insertar_masa_masa(masa_t* masa, float masa_) {
+
+    if (masa == NULL){
+        return;
+    }
     masa->masa = masa_;
 }
 

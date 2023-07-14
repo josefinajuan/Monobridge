@@ -16,31 +16,49 @@ struct resorte
 
 size_t resorte_obtener_id(const resorte_t *resorte)
 {
+    if(resorte == NULL){
+        return 0;
+    }
     return resorte->id;
 }
 
 float resorte_obtener_k(const resorte_t *resorte)
 {
+    if(resorte == NULL){
+        return 0.0;
+    }
     return resorte->k;
 }
 
 float resorte_obtener_lo(const resorte_t *resorte)
 {
+    if(resorte == NULL){
+        return 0.0;
+    }
     return resorte->lo;
 }
 
 masa_t *resorte_obtener_m1(const resorte_t *resorte)
-{
+{   
+    if(resorte == NULL){
+        return NULL;
+    }
     return resorte->m1;
 }
 
 masa_t *resorte_obtener_m2(const resorte_t *resorte)
-{
+{   
+    if(resorte == NULL){
+        return NULL;
+    }
     return resorte->m2;
 }
 
 void resorte_actualizar_l(resorte_t *resorte, float l)
 {
+    if(resorte == NULL){
+        return;
+    }
     resorte->lo = l;
 }
 

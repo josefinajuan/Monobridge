@@ -51,7 +51,7 @@ struct instante* crear_instante_desde_malla(malla_t* malla);
 // Recibe una malla, se crea el primer instante y el segundo y se devuelve una simulacion creada con los instantes adentro
 simulacion_t* simulacion_inicio(malla_t* malla);
 
-void simulacion_agregar(simulacion_t* simulacion, malla_t* malla_simulacion);
+void simulacion_agregar(simulacion_t* simulacion);
 
 void simulacion_a_malla(malla_t* malla_simulacion, simulacion_t* simulacion);
 

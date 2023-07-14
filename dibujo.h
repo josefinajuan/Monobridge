@@ -15,7 +15,7 @@ void dibujar_resorte(resorte_t *resorte, SDL_Renderer *renderer);
 
 void dibujar_lista_masas(malla_t *malla, SDL_Renderer *renderer);
 
-void dibujar_lista_resortes(malla_t *malla, SDL_Renderer *renderer);
+void dibujar_lista_resortes( malla_t *malla, SDL_Renderer *renderer);
 
 void mostrar_malla(malla_t *malla, SDL_Renderer *renderer);
 
